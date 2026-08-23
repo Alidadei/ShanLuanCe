@@ -159,6 +159,8 @@ const defaultState = () => ({
   lastPos: null,
   chats: [],
   tts: false,
+  climb: null,
+  climbHistory: [],
 });
 
 let state = (() => {
@@ -177,6 +179,12 @@ let state = (() => {
       records: Array.isArray(p.records) ? p.records : [],
       chats: Array.isArray(p.chats) ? p.chats.filter((c) => c && typeof c.text === 'string' && (c.role === 'user' || c.role === 'bot')).slice(-60) : [],
       tts: p.tts === true,
+      climb: p.climb && typeof p.climb.cid === 'string' && Array.isArray(p.climb.log)
+        ? { cid: p.climb.cid, startedAt: Number.isFinite(p.climb.startedAt) ? p.climb.startedAt : Date.now(), log: p.climb.log.filter((l) => l && Number.isFinite(+l.meters)) }
+        : null,
+      climbHistory: Array.isArray(p.climbHistory)
+        ? p.climbHistory.filter((h) => h && typeof h.cid === 'string' && Number.isFinite(h.startedAt) && Number.isFinite(h.finishedAt))
+        : [],
     };
   } catch {
     return d;
@@ -186,6 +194,7 @@ let state = (() => {
 const saveState = () => localStorage.setItem(STORE_KEY, JSON.stringify(state));
 
 const mountainById = (id) => MOUNTAINS.find((m) => m.id === id);
+const challengeById = (id) => CHALLENGES.find((c) => c.id === id);
 
 /* ================= 统计与成就 ================= */
 function computeStats() {
@@ -197,7 +206,7 @@ function computeStats() {
     ids.add(r.mountainId);
     elev += m.elevation;
   }
-  return { count: state.records.length, distinct: ids.size, ids, elev };
+  return { count: state.records.length, distinct: ids.size, ids, elev, climbSummits: (state.climbHistory || []).length };
 }
 
 const ACHIEVEMENTS = [
@@ -214,6 +223,11 @@ const ACHIEVEMENTS = [
   {
     id: 'snow', icon: '❄️', name: '雪线之上', desc: '登顶 4000 米以上的山',
     test: (s) => [...s.ids].some((id) => (mountainById(id)?.elevation || 0) >= 4000),
+  },
+  { id: 'vsummit', icon: '🎩', name: '云端登顶', desc: '完成一次步步登峰虚拟登顶', test: (s) => s.climbSummits >= 1 },
+  {
+    id: 'everest', icon: '👑', name: '8848 俱乐部', desc: '用日常爬升虚拟登顶珠峰',
+    test: () => (state.climbHistory || []).some((h) => h.cid === 'everest'),
   },
 ];
 
@@ -354,6 +368,29 @@ function feedItem(r, { deletable = false } = {}) {
 }
 
 /* ================= 视图：首页 ================= */
+function climbHomeCard() {
+  const hist = state.climbHistory || [];
+  if (!state.climb) {
+    return `
+    <div class="climb-teaser" role="button" tabindex="0" data-action="goto-climb">
+      <div class="ct-txt"><b>🧗 步步登峰</b><small>${hist.length ? `已云端登顶 ${hist.length} 座 · 去下一座！` : '把每天爬的楼梯，变成登顶名山的旅程'}</small></div>
+      <span class="btn btn-primary">开启</span>
+    </div>`;
+  }
+  const info = climbInfo();
+  if (!info) return '';
+  const { ch } = info;
+  const pct = Math.round(info.frac * 100);
+  return `
+  <div class="climb-teaser on" role="button" tabindex="0" data-action="goto-climb">
+    <div class="ct-txt">
+      <div class="ct-top"><b>${ch.emoji} 正在攀登 ${ch.name}</b><span class="climb-pct">${pct}%</span></div>
+      <div class="ct-bar"><i style="width:${pct}%"></i></div>
+      <small>已爬升 ${fmtNum(info.climbed)}m / ${fmtNum(ch.elevation)}m · 当前：${info.pos ? info.pos.name : '山脚'}${info.next ? ` → ${info.next.name}` : ''}</small>
+    </div>
+  </div>`;
+}
+
 function viewHome() {
   const s = computeStats();
   const near = nearestMountain();
@@ -390,6 +427,8 @@ function viewHome() {
     <p class="brief-text">${esc(brief.text).replace(/\n/g, '<br>')}</p>
     ${brief.rec ? chatCard(brief.rec.m.id) : ''}
   </div>
+
+  ${climbHomeCard()}
 
   <div class="section-title">为你推荐 <small>风景评分最高</small></div>
   <div class="h-scroll">${featured.map(mountainMini).join('')}</div>
@@ -638,12 +677,12 @@ function viewProfile() {
     <button class="btn btn-ghost" data-action="import-gpx">📥 导入 GPX 轨迹</button>
     <button class="btn btn-danger-ghost" data-action="clear">🗑️ 清空记录</button>
   </div>
-  <div style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:22px">爬山趣 v1.4 · 山灵 powered · 数据仅保存在本机</div>
+  <div style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:22px">爬山趣 v2.0 · 步步登峰 · 数据仅保存在本机</div>
   `;
 }
 
 /* ================= 路由 ================= */
-const VIEWS = { home: viewHome, explore: viewExplore, records: viewRecords, profile: viewProfile };
+const VIEWS = { home: viewHome, explore: viewExplore, records: viewRecords, profile: viewProfile, climb: viewClimb };
 
 function route() {
   const hash = location.hash || '#/home';
@@ -803,6 +842,12 @@ function applyImport(data) {
     joinedAt: Number.isFinite(data.joinedAt) ? data.joinedAt : d.joinedAt,
     lastPos: data.lastPos && Number.isFinite(data.lastPos.lat) && Number.isFinite(data.lastPos.lng) ? data.lastPos : null,
     tts: data.tts === true,
+    climb: data.climb && typeof data.climb.cid === 'string' && Array.isArray(data.climb.log)
+      ? { cid: data.climb.cid, startedAt: Number.isFinite(data.climb.startedAt) ? data.climb.startedAt : Date.now(), log: data.climb.log.filter((l) => l && Number.isFinite(+l.meters)) }
+      : null,
+    climbHistory: Array.isArray(data.climbHistory)
+      ? data.climbHistory.filter((h) => h && typeof h.cid === 'string' && Number.isFinite(h.startedAt) && Number.isFinite(h.finishedAt))
+      : [],
     records: recs.map((r, i) => ({
       id: typeof r.id === 'string' ? r.id : 'imp' + Date.now() + '-' + i,
       mountainId: r.mountainId,
@@ -857,7 +902,7 @@ function saveRecord() {
 }
 
 /* ================= 山灵 · AI 登山搭子 ================= */
-const QUICK_QUESTIONS = ['想看云海去哪？', '带爸妈休闲爬，求推荐', '周末两天能去哪？', '想挑战 5000 米雪山', '离我近的有哪些？', '我打卡几次了？'];
+const QUICK_QUESTIONS = ['想看云海去哪？', '带爸妈休闲爬，求推荐', '我的攀登进度怎么样？', '想挑战 5000 米雪山', '离我近的有哪些？', '我打卡几次了？'];
 
 const TAG_SEASON = { 红叶: [9, 10, 11], 草甸: [5, 6, 9, 10], 雪山: [5, 6, 9, 10], 云海: [3, 4, 5, 9, 10, 11], 星空: [6, 7, 8, 9] };
 
@@ -939,10 +984,30 @@ function chatGreeting() {
   return t;
 }
 
+function climbStatusText() {
+  const hist = state.climbHistory || [];
+  const info = climbInfo();
+  let t = '';
+  if (info) {
+    t = `步步登峰 · ${info.ch.emoji} ${info.ch.name}：已爬升 ${fmtNum(info.climbed)}m / ${fmtNum(info.ch.elevation)}m（${Math.round(info.frac * 100)}%），当前位于「${info.pos ? info.pos.name : '山脚'}」`;
+    if (info.next) t += `，下一站「${info.next.name}」还差 ${fmtNum(info.next.alt - info.climbed)}m`;
+    if (info.eta) t += `。按日均 ${fmtNum(info.daily)}m 推算，预计 ${info.eta} 登顶`;
+  } else if (hist.length) {
+    const last = challengeById(hist[hist.length - 1]?.cid);
+    t = `你已完成 ${hist.length} 次虚拟登顶${last ? `（最近：${last.name}）` : ''}，要不要开启下一座？珠峰 8848m 在等你 👑`;
+  } else {
+    t = '你还没开始虚拟攀登——去「步步登峰」选一座山，把每天爬的楼梯记进去，就能沿真实山径一路登顶！';
+  }
+  return t;
+}
+
 function chatReply(text) {
   const intent = parseIntent(text);
   if (/你好|您好|hi|hello|在吗/i.test(text)) return { text: chatGreeting() };
   if (/谢谢|感谢|辛苦/.test(text)) return { text: '不客气～愿你山高路远，脚步不停 ⛰️ 还想了解哪座山，随时问我。' };
+  if (/攀登|步步|爬升|虚拟登顶/.test(text) && !intent.named) {
+    return { text: climbStatusText() };
+  }
   if (intent.named) {
     const m = intent.named;
     const d = distToMountain(m);
@@ -955,7 +1020,9 @@ function chatReply(text) {
   if (/打卡|记录|几次|成就|进度|统计/.test(text)) {
     const s = computeStats();
     const un = unlockedIds().length;
-    return { text: `你目前打卡 ${s.count} 次，登顶 ${s.distinct} 座山，累计海拔 ${fmtNum(s.elev)} 米，成就解锁 ${un}/${ACHIEVEMENTS.length} 枚。\n\n🎯 下一步：${nextGoalHint()}` };
+    let t = `你目前打卡 ${s.count} 次，登顶 ${s.distinct} 座山，累计海拔 ${fmtNum(s.elev)} 米，成就解锁 ${un}/${ACHIEVEMENTS.length} 枚。\n\n🎯 下一步：${nextGoalHint()}`;
+    if (state.climb || (state.climbHistory || []).length) t += `\n\n🧗 ${climbStatusText()}`;
+    return { text: t };
   }
   const picks = recommendMountains(intent);
   const intro = intent.easy ? '轻松休闲的路线，我帮你挑了这几座：'
@@ -980,6 +1047,10 @@ function agentBriefing() {
   if (s.count) bits.push(`你已登顶 ${s.distinct} 座、累计 ${fmtNum(s.elev)} 米。${nextGoalHint()}`);
   else bits.push('手账还是空白的——不如这个周末就去登顶第一座山');
   if (near) bits.push(`离你最近的是${near.m.name}（约 ${fmtDist(near.d)}）`);
+  if (state.climb) {
+    const ci = climbInfo();
+    if (ci) bits.push(`步步登峰已爬升 ${Math.round(ci.frac * 100)}%，当前在${ci.pos ? ci.pos.name : '山脚'}`);
+  }
   const rec = recommendMountains(parseIntent(''), 1)[0];
   return { text: `${greet}，${state.nickname}！${bits.join('。')}。今日推荐 ↓`, rec };
 }
@@ -1245,7 +1316,281 @@ function confirmGpxImport() {
   notifyNewAchievements(before);
 }
 
-/* ================= 语音交互 ================= */
+/* ================= 步步登峰 · 虚拟攀登 ================= */
+const climbSum = (log) => (log || []).reduce((a, b) => a + (+b.meters || 0), 0);
+
+function climbInfo() {
+  const c = state.climb;
+  if (!c) return null;
+  const ch = challengeById(c.cid);
+  if (!ch) return null;
+  const climbed = climbSum(c.log);
+  const frac = Math.min(1, climbed / ch.elevation);
+  let pos = null, next = null;
+  for (let i = 0; i < ch.waypoints.length; i++) {
+    if (ch.waypoints[i].alt <= climbed) pos = ch.waypoints[i];
+    else { next = ch.waypoints[i]; break; }
+  }
+  const days = Math.max(1, Math.ceil((Date.now() - c.startedAt) / 864e5));
+  const daily = Math.round(climbed / days);
+  const remaining = Math.max(0, ch.elevation - climbed);
+  let eta = null;
+  if (daily > 0 && remaining > 0) {
+    const d = new Date(Date.now() + Math.ceil(remaining / daily) * 864e5);
+    eta = `${d.getMonth() + 1} 月 ${d.getDate()} 日`;
+  }
+  return { ch, climbed, frac, pos, next, daily, remaining, eta, days, log: c.log, startedAt: c.startedAt };
+}
+
+/* 山径剖面：横轴按地标等距，纵轴按海拔；已爬路段高亮 */
+function climbProfileSvg(info) {
+  const { ch, frac, pos } = info;
+  const W = 340, H = 138, padX = 10, padT = 22, padB = 30;
+  const n = ch.waypoints.length;
+  const px = (i) => padX + (i / (n - 1)) * (W - 2 * padX);
+  const py = (alt) => H - padB - (alt / ch.elevation) * (H - padT - padB);
+  const pts = ch.waypoints.map((w, i) => [px(i), py(w.alt)]);
+  // 当前位置（在两段之间按海拔线性插值）
+  let seg = 0, t = 0;
+  for (let i = 0; i < n - 1; i++) {
+    const a = ch.waypoints[i].alt / ch.elevation, b = ch.waypoints[i + 1].alt / ch.elevation;
+    if (frac <= b) { seg = i; t = b === a ? 1 : Math.max(0, (frac - a) / (b - a)); break; }
+    if (i === n - 2) { seg = i; t = 1; }
+  }
+  const cur = [px(seg) + t * (px(seg + 1) - px(seg)), py(frac * ch.elevation)];
+  const donePts = pts.slice(0, seg + 1).concat([cur]);
+  const doneLine = donePts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+  const fullLine = pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+  const areaD = `M${px(0)},${H - padB} L${doneLine} L${cur[0].toFixed(1)},${H - padB} Z`;
+  const gid = `cg-${ch.id}-${uid()}`;
+  const labels = ch.waypoints.map((w, i) => {
+    const up = i % 2 === 0;
+    return `
+    <line x1="${px(i)}" y1="${py(w.alt)}" x2="${px(i)}" y2="${H - padB}" stroke="#d9e5dc" stroke-width="1" stroke-dasharray="2 3"/>
+    <circle cx="${px(i)}" cy="${py(w.alt)}" r="3" fill="${i <= seg ? ch.colors[3] : '#c6d4ca'}"/>
+    <text x="${px(i)}" y="${up ? H - 19 : H - 6}" font-size="8.5" fill="${i <= seg ? ch.colors[3] : '#93a89b'}" text-anchor="middle" font-weight="${i <= seg ? 700 : 400}">${w.name}</text>`;
+  }).join('');
+  return `
+  <svg viewBox="0 0 ${W} ${H}" class="climb-svg" aria-label="攀登进度剖面">
+    <defs>
+      <linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="${ch.colors[2]}" stop-opacity=".45"/>
+        <stop offset="1" stop-color="${ch.colors[2]}" stop-opacity=".06"/>
+      </linearGradient>
+    </defs>
+    <polyline points="${fullLine}" fill="none" stroke="#d5e1d8" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="${areaD}" fill="url(#${gid})"/>
+    <polyline points="${doneLine}" fill="none" stroke="${ch.colors[3]}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    ${labels}
+    <line x1="${cur[0]}" y1="${cur[1]}" x2="${cur[0]}" y2="${H - padB}" stroke="${ch.colors[3]}" stroke-width="1.2" opacity=".5"/>
+    <text x="${Math.min(W - 12, Math.max(12, cur[0]))}" y="${Math.max(12, cur[1] - 8)}" font-size="13" text-anchor="middle">🧗</text>
+    <text x="2" y="12" font-size="9" fill="#8ba397">累计爬升 ${fmtNum(info.climbed)} m</text>
+    <text x="${W - 2}" y="12" font-size="9" fill="#8ba397" text-anchor="end">${Math.round(info.frac * 100)}%</text>
+  </svg>`;
+}
+
+function startChallenge(cid) {
+  const ch = challengeById(cid);
+  if (!ch) return;
+  if (state.climb && climbSum(state.climb.log) > 0) {
+    const cur = challengeById(state.climb.cid);
+    if (!confirm(`正在攀登${cur ? cur.name : ''}，切换挑战将放弃当前进度，确定吗？`)) return;
+  }
+  state.climb = { cid, startedAt: Date.now(), log: [] };
+  saveState();
+  route();
+  toast(`开始了「${ch.name}」的虚拟攀登 ${ch.emoji} 每天记录爬升，向 ${fmtNum(ch.elevation)}m 进发！`);
+}
+
+function addClimbLog(meters, date) {
+  meters = Math.round(+meters || 0);
+  if (meters <= 0) { toast('请输入有效的爬升量（层数或米数二选一）'); return; }
+  if (!state.climb) { toast('先在上方选择一座山开始挑战'); return; }
+  const c = state.climb;
+  const ch = challengeById(c.cid);
+  const before = new Set(unlockedIds());
+  const old = climbSum(c.log);
+  c.log.push({ id: 'l' + Date.now(), date: date || todayStr(), meters });
+  const now = old + meters;
+  if (now >= ch.elevation && old < ch.elevation) {
+    state.climbHistory.push({ cid: c.cid, startedAt: c.startedAt, finishedAt: Date.now(), meters: now });
+    state.climb = null;
+    saveState();
+    confetti();
+    toast(`🎉 恭喜！你用日常爬升登顶了${ch.name} ${ch.emoji}`);
+    notifyNewAchievements(before);
+    route();
+    return;
+  }
+  saveState();
+  route();
+  const crossed = ch.waypoints.filter((w) => w.alt > old && w.alt <= now && w.alt < ch.elevation);
+  crossed.forEach((w, i) => setTimeout(() => toast(`📍 已抵达「${w.name}」· 海拔 ${fmtNum(w.alt)}m`), 300 + i * 700));
+  notifyNewAchievements(before);
+}
+
+/* 登顶证书 */
+function certSvg(h) {
+  const ch = challengeById(h.cid);
+  const days = Math.max(1, Math.ceil((h.finishedAt - h.startedAt) / 864e5));
+  const d = new Date(h.finishedAt);
+  const dateStr = `${d.getFullYear()} 年 ${d.getMonth() + 1} 月 ${d.getDate()} 日`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="750" height="1000" viewBox="0 0 750 1000">
+  <rect width="750" height="1000" fill="#fbf7ee"/>
+  <rect x="28" y="28" width="694" height="944" fill="none" stroke="#1b4332" stroke-width="3"/>
+  <rect x="40" y="40" width="670" height="920" fill="none" stroke="#b8860b" stroke-width="1.5"/>
+  <text x="375" y="150" text-anchor="middle" font-size="72" font-weight="900" fill="#1b4332" font-family="KaiTi, STKaiti, 'Noto Serif SC', serif" letter-spacing="18">登顶证书</text>
+  <text x="375" y="196" text-anchor="middle" font-size="20" fill="#8ba397" letter-spacing="6">CLIMBING CERTIFICATE · 步步登峰</text>
+  <line x1="180" y1="222" x2="570" y2="222" stroke="#b8860b" stroke-width="1"/>
+  <text x="375" y="300" text-anchor="middle" font-size="26" fill="#44554c">兹证明</text>
+  <text x="375" y="368" text-anchor="middle" font-size="48" font-weight="800" fill="#123527">${esc(state.nickname)}</text>
+  <text x="375" y="428" text-anchor="middle" font-size="24" fill="#44554c">以日常累计爬升 ${fmtNum(h.meters)} 米</text>
+  <text x="375" y="470" text-anchor="middle" font-size="24" fill="#44554c">成功虚拟登顶</text>
+  <text x="375" y="545" text-anchor="middle" font-size="52" font-weight="900" fill="${ch.colors[3]}" font-family="KaiTi, STKaiti, serif">${ch.emoji} ${ch.name}</text>
+  <text x="375" y="595" text-anchor="middle" font-size="24" fill="#8ba397">海拔 ${fmtNum(ch.elevation)} 米</text>
+  <line x1="180" y1="640" x2="570" y2="640" stroke="#d9cfb8" stroke-width="1"/>
+  <text x="255" y="690" text-anchor="middle" font-size="20" fill="#44554c">用时 ${days} 天</text>
+  <text x="375" y="690" text-anchor="middle" font-size="20" fill="#44554c">日均 ${fmtNum(Math.round(h.meters / days))} 米</text>
+  <text x="495" y="690" text-anchor="middle" font-size="20" fill="#44554c">${dateStr}</text>
+  <g transform="translate(600,780)">
+    <circle r="62" fill="none" stroke="#c0392b" stroke-width="4"/>
+    <circle r="52" fill="none" stroke="#c0392b" stroke-width="1.5"/>
+    <text y="-12" text-anchor="middle" font-size="26" fill="#c0392b" font-weight="900" font-family="KaiTi, STKaiti, serif">登顶</text>
+    <text y="24" text-anchor="middle" font-size="17" fill="#c0392b" font-weight="700" font-family="KaiTi, STKaiti, serif">${esc(ch.name)}</text>
+  </g>
+  <text x="150" y="850" font-size="15" fill="#8ba397">爬山趣 · 山灵认证</text>
+  <text x="150" y="878" font-size="15" fill="#8ba397">凭日常脚步，抵山川之巅</text>
+</svg>`;
+}
+
+function downloadCert(h) {
+  const svgStr = certSvg(h);
+  const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  const ch = challengeById(h.cid);
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 750;
+    canvas.height = 1000;
+    canvas.getContext('2d').drawImage(img, 0, 0, 750, 1000);
+    URL.revokeObjectURL(url);
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = `登顶证书-${ch.name}.png`;
+    a.click();
+    toast('证书已保存到下载 📜');
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); toast('证书生成失败，请重试'); };
+  img.src = url;
+}
+
+function openCertModal(h) {
+  const ch = challengeById(h.cid);
+  $('#modal-root').innerHTML = `
+  <div class="modal-mask" data-action="close-modal-bg">
+    <div class="modal-sheet" data-stop="1">
+      <div class="m-head">
+        <h3>📜 ${ch.emoji} ${ch.name} 登顶证书</h3>
+        <button class="m-close" data-action="close-modal">✕</button>
+      </div>
+      <div class="cert-wrap">${certSvg(h)}</div>
+      <button class="btn btn-primary btn-block" data-action="cert-download" style="margin-top:12px">⬇️ 下载证书图片</button>
+    </div>
+  </div>`;
+}
+
+/* ================= 视图：步步登峰 ================= */
+function viewClimb() {
+  const info = climbInfo();
+  const hist = [...(state.climbHistory || [])].reverse();
+  const last = hist[0];
+  return `
+  <div class="climb-head">
+    <h2>🧗 步步登峰</h2>
+    <p>把每天爬的楼梯，变成登顶名山的旅程</p>
+  </div>
+
+  <div class="chips-row" style="margin-bottom:14px">
+    ${CHALLENGES.map((c) => {
+      const done = (state.climbHistory || []).some((h) => h.cid === c.id);
+      const active = state.climb?.cid === c.id;
+      return `<button type="button" class="chip ${active ? 'on' : ''}" data-action="start-challenge" data-id="${c.id}">${done ? '✅' : c.emoji} ${c.name} ${fmtNum(c.elevation)}m</button>`;
+    }).join('')}
+  </div>
+
+  ${info ? (() => {
+    const { ch } = info;
+    return `
+    <div class="card climb-card">
+      <div class="climb-title">
+        <div><b>${ch.emoji} ${ch.name}</b><small>${esc(ch.desc)}</small></div>
+        <span class="climb-pct">${Math.round(info.frac * 100)}%</span>
+      </div>
+      ${climbProfileSvg(info)}
+      <div class="climb-now">
+        📍 当前位置：<b>${info.pos ? info.pos.name : '山脚'}</b>
+        ${info.next ? ` · 下一站「${info.next.name}」还差 <b>${fmtNum(info.next.alt - info.climbed)}m</b>` : ''}
+      </div>
+      <div class="climb-stats">
+        <div><b>${fmtNum(info.climbed)}m</b><span>已爬升</span></div>
+        <div><b>${fmtNum(info.remaining)}m</b><span>距登顶</span></div>
+        <div><b>${fmtNum(info.daily)}m</b><span>日均</span></div>
+        <div><b>${info.eta ? info.eta : '—'}</b><span>预计登顶</span></div>
+      </div>
+    </div>
+
+    <div class="card climb-log-card">
+      <div class="form-row" style="margin:0">
+        <label>记录今日爬升（手机健康 App 的“爬楼”数据即可）</label>
+        <div class="form-cols">
+          <div class="form-row" style="margin:0">
+            <input id="cl-floors" class="control" type="number" min="0" step="1" placeholder="爬楼层数">
+          </div>
+          <div class="form-row" style="margin:0">
+            <input id="cl-meters" class="control" type="number" min="0" step="1" placeholder="或直接填米数">
+          </div>
+        </div>
+        <p class="climb-hint">1 层 ≈ 3 米 · 两栏填一个就行</p>
+        <button class="btn btn-primary btn-block" data-action="climb-log">＋ 记录爬升</button>
+      </div>
+      ${info.log.length ? `
+      <div class="section-title" style="margin:14px 0 8px">爬升日志 <small>共 ${info.log.length} 条</small></div>
+      ${[...info.log].reverse().slice(0, 10).map((l) => `
+        <div class="climb-log-item">
+          <span>${esc(l.date)}</span>
+          <b>+${l.meters}m</b>
+          <button class="del" data-action="del-climb-log" data-id="${l.id}" aria-label="删除">✕</button>
+        </div>`).join('')}` : ''}
+    </div>`;
+  })() : `
+    <div class="card climb-card">
+      <div class="empty" style="padding:30px 20px">
+        <div class="empty-icon">🧗</div>
+        还没有进行中的挑战<br>选一座山，从今天的楼梯开始
+      </div>
+    </div>`}
+
+  ${last ? `
+  <div class="climb-done card">
+    <div class="cd-left">${challengeById(last.cid)?.emoji || '🏔️'}</div>
+    <div class="cd-mid">
+      <b>已登顶 ${challengeById(last.cid)?.name || ''}</b>
+      <small>${new Date(last.finishedAt).toLocaleDateString('zh-CN')} · 累计 ${fmtNum(last.meters)}m</small>
+    </div>
+    <button class="btn btn-ghost" data-action="show-cert">📜 证书</button>
+  </div>` : ''}
+
+  ${(state.climbHistory || []).length > 1 ? `
+  <div class="section-title">攀登履历 <small>${state.climbHistory.length} 座</small></div>
+  <div class="chips-row">
+    ${(state.climbHistory || []).map((h) => {
+      const c = challengeById(h.cid);
+      return c ? `<span class="chip">✅ ${c.emoji} ${c.name}</span>` : '';
+    }).join('')}
+  </div>` : ''}
+  `;
+}
 let voiceRecog = null;
 const getSR = () => window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -1369,6 +1714,39 @@ function handleAction(t) {
     case 'gpx-confirm':
       confirmGpxImport();
       break;
+    case 'goto-climb':
+      location.hash = '#/climb';
+      break;
+    case 'start-challenge':
+      startChallenge(t.dataset.id);
+      break;
+    case 'climb-log': {
+      const floors = parseFloat($('#cl-floors')?.value);
+      const meters = parseFloat($('#cl-meters')?.value);
+      const date = todayStr();
+      if (Number.isFinite(meters) && meters > 0) addClimbLog(meters, date);
+      else if (Number.isFinite(floors) && floors > 0) addClimbLog(floors * 3, date);
+      else toast('请填写爬楼层数或米数');
+      break;
+    }
+    case 'del-climb-log':
+      if (state.climb) {
+        state.climb.log = state.climb.log.filter((l) => l.id !== t.dataset.id);
+        saveState();
+        route();
+        toast('已删除该条爬升记录');
+      }
+      break;
+    case 'show-cert': {
+      const last = [...(state.climbHistory || [])].reverse()[0];
+      if (last) openCertModal(last);
+      break;
+    }
+    case 'cert-download': {
+      const last = [...(state.climbHistory || [])].reverse()[0];
+      if (last) downloadCert(last);
+      break;
+    }
     case 'back':
       history.length > 1 ? history.back() : (location.hash = '#/explore');
       break;
@@ -1474,9 +1852,11 @@ function handleAction(t) {
       break;
     }
     case 'clear':
-      if (confirm('确定清空所有打卡记录吗？（个人资料会保留）')) {
+      if (confirm('确定清空所有打卡与攀登记录吗？（个人资料会保留）')) {
         state.records = [];
         state.lastPos = null;
+        state.climb = null;
+        state.climbHistory = [];
         saveState();
         route();
         toast('记录已清空，资料已保留');

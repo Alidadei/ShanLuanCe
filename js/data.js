@@ -362,3 +362,62 @@ const COORDS = {
   hengshan_s: [27.256, 112.683],
   songshan: [34.490, 113.040],
 };
+
+/* 步步登峰 · 虚拟挑战山峰（日常爬升沿真实山径剖面前进） */
+const CHALLENGES = [
+  {
+    id: 'taishan', name: '泰山', emoji: '🌄', elevation: 1545, suggest: '约 2 周',
+    desc: '把每天的楼梯变成六千级台阶，从红门一路走到玉皇顶。',
+    colors: ['#ff9d6e', '#ffe0b0', '#b06a3b', '#7a4629'],
+    waypoints: [
+      { alt: 250, name: '红门' }, { alt: 847, name: '中天门' }, { alt: 950, name: '云步桥' },
+      { alt: 1300, name: '十八盘' }, { alt: 1460, name: '南天门' }, { alt: 1545, name: '玉皇顶' },
+    ],
+  },
+  {
+    id: 'huangshan', name: '黄山', emoji: '🌊', elevation: 1864, suggest: '约 3 周',
+    desc: '一步一景，向莲花峰顶的云海进发。',
+    colors: ['#8fc3dd', '#eaf6fa', '#7fa8b8', '#4f7583'],
+    waypoints: [
+      { alt: 370, name: '慈光阁' }, { alt: 700, name: '立马桥' }, { alt: 900, name: '半山寺' },
+      { alt: 1660, name: '玉屏楼' }, { alt: 1864, name: '莲花峰' },
+    ],
+  },
+  {
+    id: 'huashan', name: '华山', emoji: '🧗', elevation: 2154, suggest: '约 4 周',
+    desc: '自古华山一条路，垂直的台阶考验每天的你。',
+    colors: ['#8e7cc3', '#d8cff0', '#8a86a8', '#565b73'],
+    waypoints: [
+      { alt: 400, name: '玉泉院' }, { alt: 1200, name: '青柯坪' }, { alt: 1600, name: '千尺幢' },
+      { alt: 1614, name: '北峰' }, { alt: 1700, name: '苍龙岭' }, { alt: 2154, name: '南峰' },
+    ],
+  },
+  {
+    id: 'emeishan', name: '峨眉山', emoji: '🐘', elevation: 3079, suggest: '约 6 周',
+    desc: '全程五十公里的朝圣路，用日常爬升丈量它。',
+    colors: ['#f2d488', '#fdf3d0', '#7ba05b', '#4c6f3f'],
+    waypoints: [
+      { alt: 530, name: '报国寺' }, { alt: 780, name: '清音阁' }, { alt: 1120, name: '洪椿坪' },
+      { alt: 1750, name: '仙峰寺' }, { alt: 2430, name: '雷洞坪' }, { alt: 3079, name: '金顶' },
+    ],
+  },
+  {
+    id: 'yulong', name: '玉龙雪山', emoji: '❄️', elevation: 5596, suggest: '约 3 个月',
+    desc: '从甘海子到扇子陡，一日四季的雪线远征。',
+    colors: ['#a8c8dd', '#eef7fb', '#9fc4d8', '#6f97b5'],
+    waypoints: [
+      { alt: 3100, name: '甘海子' }, { alt: 4506, name: '冰川公园' },
+      { alt: 4680, name: '4680 观景台' }, { alt: 5596, name: '扇子陡' },
+    ],
+  },
+  {
+    id: 'everest', name: '珠穆朗玛峰', emoji: '🏔️', elevation: 8848, suggest: '约半年',
+    desc: '用半年的日常爬升，走完人类最伟大的 8848 米。',
+    colors: ['#b8d4e8', '#f0f8ff', '#c8dce8', '#8fb3cc'],
+    waypoints: [
+      { alt: 5364, name: '大本营' }, { alt: 6065, name: 'C1 营地' }, { alt: 6400, name: 'C2 营地' },
+      { alt: 7162, name: 'C3 营地' }, { alt: 7925, name: '南坳' },
+      { alt: 8790, name: '希拉里台阶' }, { alt: 8848, name: '顶峰' },
+    ],
+  },
+];
