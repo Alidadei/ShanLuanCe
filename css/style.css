@@ -751,9 +751,8 @@ ul { list-style: none; }
 }
 .ach.off .ach-state { color: #b6c2bc; }
 
-.data-zone { display: flex; gap: 10px; }
-.data-zone .btn { flex: 1; }
-.data-zone .btn { font-size: 13px; padding: 10px 6px; }
+.data-zone { display: flex; gap: 10px; flex-wrap: wrap; }
+.data-zone .btn { flex: 1 1 40%; font-size: 13px; padding: 10px 6px; }
 
 /* 头像选择 */
 .ava-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 7px; }
@@ -1140,6 +1139,68 @@ ul { list-style: none; }
 }
 .chat-input-bar input:focus { border-color: var(--green-400); background: #fff; }
 .chat-input-bar .btn { padding: 10px 18px; flex-shrink: 0; }
+
+.mic-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #eef4ef;
+  font-size: 18px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s ease;
+  border: 1.5px solid var(--line);
+}
+.mic-btn.listening {
+  background: #fdecec;
+  border-color: #d64545;
+  animation: micPulse 1.2s ease-in-out infinite;
+}
+@keyframes micPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(214, 69, 69, .35); }
+  50% { box-shadow: 0 0 0 8px rgba(214, 69, 69, 0); }
+}
+
+.ch-tts {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .18);
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ch-tts.on { background: rgba(88, 230, 168, .3); }
+
+/* ============ GPX 导入 ============ */
+.gpx-file-info {
+  font-size: 12.5px;
+  color: var(--muted);
+  background: #f4f8f5;
+  border-radius: 10px;
+  padding: 9px 12px;
+  margin-bottom: 12px;
+  line-height: 1.55;
+}
+.gpx-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 11px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 13px;
+  margin-bottom: 9px;
+  cursor: pointer;
+}
+.gpx-item:has(input:checked) { border-color: var(--green-400); background: #f4fbf6; }
+.gpx-item input { margin-top: 4px; accent-color: var(--green-500); width: 16px; height: 16px; }
+.gpx-item b { font-size: 14px; margin-right: 6px; }
+.gpx-item .badge { margin-right: 4px; }
+.gpx-item small { display: block; font-size: 11.5px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+.gpx-item.off { opacity: .55; cursor: default; border-style: dashed; }
 
 /* ============ 山峰护照 ============ */
 .passport {

@@ -158,6 +158,7 @@ const defaultState = () => ({
   records: [],
   lastPos: null,
   chats: [],
+  tts: false,
 });
 
 let state = (() => {
@@ -175,6 +176,7 @@ let state = (() => {
       lastPos: p.lastPos && Number.isFinite(p.lastPos.lat) && Number.isFinite(p.lastPos.lng) ? p.lastPos : null,
       records: Array.isArray(p.records) ? p.records : [],
       chats: Array.isArray(p.chats) ? p.chats.filter((c) => c && typeof c.text === 'string' && (c.role === 'user' || c.role === 'bot')).slice(-60) : [],
+      tts: p.tts === true,
     };
   } catch {
     return d;
@@ -560,7 +562,10 @@ function viewRecords() {
         <h2>我的登山手账</h2>
         <div class="sub">${esc(state.nickname)} · 每一步都算数</div>
       </div>
-      <button class="btn btn-primary" data-action="checkin" style="padding:9px 16px">＋ 打卡</button>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <button class="btn btn-ghost" data-action="import-gpx" title="导入两步路/绿野游踪等 App 导出的 GPX 轨迹">📥 GPX</button>
+        <button class="btn btn-primary" data-action="checkin" style="padding:9px 16px">＋ 打卡</button>
+      </div>
     </div>
     <div class="summary-grid">
       <div class="sg"><b>${s.count}</b><span>打卡次数</span></div>
@@ -630,9 +635,10 @@ function viewProfile() {
   <div class="data-zone">
     <button class="btn btn-ghost" data-action="export">⬇️ 导出备份</button>
     <button class="btn btn-ghost" data-action="import">⬆️ 导入恢复</button>
+    <button class="btn btn-ghost" data-action="import-gpx">📥 导入 GPX 轨迹</button>
     <button class="btn btn-danger-ghost" data-action="clear">🗑️ 清空记录</button>
   </div>
-  <div style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:22px">爬山趣 v1.3 · 山灵 powered · 数据仅保存在本机</div>
+  <div style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:22px">爬山趣 v1.4 · 山灵 powered · 数据仅保存在本机</div>
   `;
 }
 
@@ -796,6 +802,7 @@ function applyImport(data) {
     motto: typeof data.motto === 'string' && data.motto.trim() ? data.motto.trim().slice(0, 30) : d.motto,
     joinedAt: Number.isFinite(data.joinedAt) ? data.joinedAt : d.joinedAt,
     lastPos: data.lastPos && Number.isFinite(data.lastPos.lat) && Number.isFinite(data.lastPos.lng) ? data.lastPos : null,
+    tts: data.tts === true,
     records: recs.map((r, i) => ({
       id: typeof r.id === 'string' ? r.id : 'imp' + Date.now() + '-' + i,
       mountainId: r.mountainId,
@@ -809,6 +816,15 @@ function applyImport(data) {
   saveState();
   route();
   toast(`导入成功，${state.records.length} 条记录已恢复 🎉`);
+}
+
+function notifyNewAchievements(before) {
+  const after = unlockedIds().filter((id) => !before.has(id));
+  after.forEach((id, i) => {
+    const a = ACHIEVEMENTS.find((x) => x.id === id);
+    setTimeout(() => toast(`🏅 解锁成就「${a.name}」`, true), 700 + i * 900);
+  });
+  return after.length;
 }
 
 function saveRecord() {
@@ -833,12 +849,7 @@ function saveRecord() {
   closeModal();
   confetti();
   toast(`打卡成功！登顶 ${m.name} ${m.emoji}`);
-
-  const after = unlockedIds().filter((id) => !before.has(id));
-  after.forEach((id, i) => {
-    const a = ACHIEVEMENTS.find((x) => x.id === id);
-    setTimeout(() => toast(`🏅 解锁成就「${a.name}」`, true), 700 + i * 900);
-  });
+  notifyNewAchievements(before);
 
   const hash = location.hash || '#/home';
   if (hash.startsWith('#/mountain/')) route();
@@ -1029,7 +1040,10 @@ function streamLastMsg() {
     i = Math.min(full.length, i + 2);
     bubble.innerHTML = full.slice(0, i).replace(/\n/g, '<br>') + (i < full.length ? '<span class="caret"></span>' : cards);
     scrollChat();
-    if (i >= full.length) clearInterval(chatStreamTimer);
+    if (i >= full.length) {
+      clearInterval(chatStreamTimer);
+      speakText(last.text);
+    }
   }, 16);
 }
 
@@ -1042,6 +1056,7 @@ function openChat() {
     <div class="chat-head">
       <div class="ch-ava" aria-hidden="true">🏔️</div>
       <div class="ch-info"><b>山灵</b><small>AI 登山搭子 · 在线</small></div>
+      <button class="ch-tts ${state.tts ? 'on' : ''}" data-action="toggle-tts" title="${state.tts ? '关闭语音播报' : '开启语音播报山灵回复'}">${state.tts ? '🔊' : '🔇'}</button>
       <button class="m-close" data-action="close-chat" aria-label="关闭对话">✕</button>
     </div>
     <div class="chat-body" id="chat-body"></div>
@@ -1049,6 +1064,7 @@ function openChat() {
       ${QUICK_QUESTIONS.map((q) => `<button type="button" class="chip" data-action="chat-quick" data-q="${esc(q)}">${esc(q)}</button>`).join('')}
     </div>
     <div class="chat-input-bar">
+      <button type="button" class="mic-btn" id="chat-mic" data-action="voice" aria-label="语音输入" title="按一下开始说话，说完自动发送">🎤</button>
       <input id="chat-input" type="text" placeholder="问问山灵：想看云海去哪？" maxlength="120">
       <button type="button" class="btn btn-primary" data-action="chat-send">发送</button>
     </div>
@@ -1084,7 +1100,194 @@ function sendChat(text) {
   }, 600 + Math.random() * 500);
 }
 
-/* ================= 登顶庆祝 ================= */
+/* ================= GPX 真实轨迹导入 ================= */
+/* 把轨迹列表识别为打卡候选：先按名称匹配，再按起终点与山顶的距离（25km 内）匹配 */
+function gpxCandidates(tracks) {
+  return tracks.map((tr) => {
+    const pts = (tr.points || []).filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lng));
+    if (!pts.length) return null;
+    let m = null;
+    let byName = false;
+    const hay = tr.name || '';
+    m = MOUNTAINS.find((mm) => hay.includes(mm.name.replace('大峰', '')));
+    if (m) {
+      byName = true;
+    } else {
+      let bestD = Infinity, bestM = null;
+      for (const mm of MOUNTAINS) {
+        const c = COORDS[mm.id];
+        if (!c) continue;
+        const d = Math.min(
+          haversine(pts[0].lat, pts[0].lng, c[0], c[1]),
+          haversine(pts[pts.length - 1].lat, pts[pts.length - 1].lng, c[0], c[1])
+        );
+        if (d < bestD) { bestD = d; bestM = mm; }
+      }
+      if (bestM && bestD <= 25) m = bestM;
+    }
+    const times = pts.map((p) => p.time).filter(Boolean).sort();
+    const start = times.length ? new Date(times[0]) : null;
+    const end = times.length ? new Date(times[times.length - 1]) : null;
+    let durationH = null;
+    if (start && end && end > start) durationH = Math.round(((end - start) / 36e5) * 2) / 2;
+    let distKm = null;
+    if (pts.length > 1) {
+      let s = 0;
+      for (let i = 1; i < pts.length; i++) s += haversine(pts[i - 1].lat, pts[i - 1].lng, pts[i].lat, pts[i].lng);
+      distKm = Math.round(s);
+    }
+    const date = start && !Number.isNaN(start.getTime())
+      ? `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-${String(start.getDate()).padStart(2, '0')}`
+      : todayStr();
+    return m
+      ? { m, byName, date, durationH, distKm, trackName: tr.name || '未命名轨迹' }
+      : { unmatched: true, trackName: tr.name || '未命名轨迹' };
+  }).filter(Boolean);
+}
+
+function parseGpxText(text) {
+  let doc;
+  try {
+    doc = new DOMParser().parseFromString(text, 'application/xml');
+  } catch {
+    return [];
+  }
+  if (!doc || doc.getElementsByTagName('parsererror').length) return [];
+  const tracks = [];
+  for (const trk of Array.from(doc.getElementsByTagName('trk'))) {
+    const name = (trk.getElementsByTagName('name')[0]?.textContent || '').trim();
+    const points = Array.from(trk.getElementsByTagName('trkpt')).map((p) => ({
+      lat: parseFloat(p.getAttribute('lat')),
+      lng: parseFloat(p.getAttribute('lon')),
+      time: p.getElementsByTagName('time')[0]?.textContent || '',
+    }));
+    if (points.length) tracks.push({ name, points });
+  }
+  if (!tracks.length) {
+    const wpts = Array.from(doc.getElementsByTagName('wpt'));
+    if (wpts.length) {
+      const name = wpts.map((w) => w.getElementsByTagName('name')[0]?.textContent || '').join(' ').trim();
+      const points = wpts.map((w) => ({
+        lat: parseFloat(w.getAttribute('lat')),
+        lng: parseFloat(w.getAttribute('lon')),
+        time: w.getElementsByTagName('time')[0]?.textContent || '',
+      }));
+      tracks.push({ name, points });
+    }
+  }
+  return gpxCandidates(tracks);
+}
+
+let gpxPending = [];
+let gpxFileName = '';
+
+function openGpxModal(cands, fileName) {
+  gpxPending = cands;
+  gpxFileName = fileName || '轨迹文件';
+  const matched = cands.filter((c) => !c.unmatched);
+  $('#modal-root').innerHTML = `
+  <div class="modal-mask" data-action="close-modal-bg">
+    <div class="modal-sheet" data-stop="1">
+      <div class="m-head">
+        <h3>📥 导入真实轨迹</h3>
+        <button class="m-close" data-action="close-modal">✕</button>
+      </div>
+      <p class="gpx-file-info">📄 ${esc(gpxFileName)} · 识别到 ${matched.length} 条可导入轨迹${cands.length - matched.length ? ` · ${cands.length - matched.length} 条未匹配山峰（跳过）` : ''}</p>
+      <div id="gpx-list">
+        ${cands.map((c, i) => {
+          if (c.unmatched) {
+            return `<div class="gpx-item off"><div><b>未识别</b><small>来源：${esc(c.trackName)} · 没有匹配到 15 座名山，已跳过</small></div></div>`;
+          }
+          const dup = state.records.some((r) => r.mountainId === c.m.id && r.date === c.date);
+          return `
+          <label class="gpx-item">
+            <input type="checkbox" ${dup ? '' : 'checked'} data-idx="${i}">
+            <div>
+              <b>${c.m.emoji} ${esc(c.m.name)}</b>
+              <span class="badge">${c.byName ? '名称匹配' : '位置匹配'}</span>
+              ${dup ? '<span class="badge" style="background:#fdeecb;color:#a06b00">疑与已有记录重复</span>' : ''}
+              <small>${esc(c.date)}${c.durationH ? ` · 用时约 ${c.durationH} 小时` : ''}${c.distKm !== null ? ` · 轨迹 ${c.distKm}km` : ''} · 来源：${esc(c.trackName)}</small>
+            </div>
+          </label>`;
+        }).join('')}
+      </div>
+      ${matched.length
+        ? `<button class="btn btn-primary btn-block" data-action="gpx-confirm" style="margin-top:6px">✓ 导入选中轨迹</button>`
+        : `<p class="gpx-file-info">💡 提示：轨迹名称含山名（如“泰山夜爬”）或起终点距山顶 25km 内即可自动识别。</p>`}
+    </div>
+  </div>`;
+}
+
+function confirmGpxImport() {
+  const boxes = $$('#gpx-list input[type="checkbox"]:checked');
+  if (!boxes.length) { toast('请至少选择一条轨迹'); return; }
+  const before = new Set(unlockedIds());
+  let n = 0;
+  boxes.forEach((b) => {
+    const c = gpxPending[+b.dataset.idx];
+    if (!c || c.unmatched) return;
+    state.records.push({
+      id: 'g' + Date.now() + '-' + n,
+      mountainId: c.m.id,
+      date: c.date,
+      duration: c.durationH,
+      rating: 5,
+      notes: `GPX 轨迹导入：${c.trackName}`,
+      createdAt: Date.now(),
+    });
+    n++;
+  });
+  saveState();
+  closeModal();
+  route();
+  if (n) confetti();
+  toast(`成功导入 ${n} 条真实登山记录 🎉`);
+  notifyNewAchievements(before);
+}
+
+/* ================= 语音交互 ================= */
+let voiceRecog = null;
+const getSR = () => window.SpeechRecognition || window.webkitSpeechRecognition;
+
+function toggleVoice() {
+  const SR = getSR();
+  if (!SR) { toast('当前浏览器不支持语音输入，试试 Chrome / Edge 🎤'); return; }
+  const mic = $('#chat-mic');
+  if (voiceRecog) { voiceRecog.stop(); return; }
+  voiceRecog = new SR();
+  voiceRecog.lang = 'zh-CN';
+  voiceRecog.interimResults = true;
+  voiceRecog.maxAlternatives = 1;
+  voiceRecog.onresult = (e) => {
+    let text = '';
+    for (let i = 0; i < e.results.length; i++) text += e.results[i][0].transcript;
+    const input = $('#chat-input');
+    if (input) input.value = text;
+    if (e.results[e.results.length - 1].isFinal) {
+      setTimeout(() => sendChat(text), 250);
+    }
+  };
+  voiceRecog.onend = () => { voiceRecog = null; if (mic) mic.classList.remove('listening'); };
+  voiceRecog.onerror = (e) => {
+    toast(e.error === 'not-allowed' ? '麦克风权限被拒绝，请在浏览器中允许后重试' : '没听清，请再试一次 🎤');
+  };
+  voiceRecog.start();
+  if (mic) mic.classList.add('listening');
+  toast('🎤 正在聆听…说完自动发送');
+}
+
+function speakText(text) {
+  if (!state.tts || !window.speechSynthesis) return;
+  const plain = String(text).replace(/[^\u4e00-\u9fa5a-zA-Z0-9，。！？、：；,.!?:%\-—…·（）()\s]/g, ' ').slice(0, 400).trim();
+  if (!plain) return;
+  const u = new SpeechSynthesisUtterance(plain);
+  u.lang = 'zh-CN';
+  u.rate = 1.05;
+  const zh = window.speechSynthesis.getVoices().find((v) => v.lang && v.lang.startsWith('zh'));
+  if (zh) u.voice = zh;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
 function confetti() {
   const root = $('#confetti-root');
   if (!root) return;
@@ -1129,6 +1332,42 @@ function handleAction(t) {
       break;
     case 'chat-quick':
       sendChat(t.dataset.q || '');
+      break;
+    case 'voice':
+      toggleVoice();
+      break;
+    case 'toggle-tts': {
+      state.tts = !state.tts;
+      saveState();
+      const btn = $('.ch-tts');
+      if (btn) {
+        btn.textContent = state.tts ? '🔊' : '🔇';
+        btn.classList.toggle('on', state.tts);
+      }
+      if (!state.tts && window.speechSynthesis) window.speechSynthesis.cancel();
+      toast(state.tts ? '已开启语音播报，山灵会把回复读给你 🔊' : '已关闭语音播报 🔇');
+      break;
+    }
+    case 'import-gpx': {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.gpx,application/gpx+xml,text/xml';
+      input.onchange = () => {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          const cands = parseGpxText(String(reader.result || ''));
+          if (!cands.length) { toast('没有解析出轨迹，请确认是 GPX 文件'); return; }
+          openGpxModal(cands, file.name);
+        };
+        reader.readAsText(file, 'utf-8');
+      };
+      input.click();
+      break;
+    }
+    case 'gpx-confirm':
+      confirmGpxImport();
       break;
     case 'back':
       history.length > 1 ? history.back() : (location.hash = '#/explore');
