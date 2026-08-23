@@ -65,31 +65,90 @@ function nearestMountain() {
 
 function requestLocation() {
   if (!navigator.geolocation) { toast('当前浏览器不支持定位 📵'); return; }
-  toast('正在精确定位…');
-  navigator.geolocation.getCurrentPosition(
+  toast('正在精确定位，请保持 GPS / Wi-Fi 开启…');
+  let best = null, finished = false, watchId = null;
+  const stopWatch = () => { if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; } };
+  const succeed = () => {
+    if (finished) return;
+    finished = true;
+    stopWatch();
+    const c = best.coords;
+    state.lastPos = { lat: c.latitude, lng: c.longitude, accuracy: Math.round(c.accuracy), at: best.timestamp };
+    saveState();
+    toast(`定位成功！精度 ±${state.lastPos.accuracy} 米 📍`);
+    route();
+  };
+  watchId = navigator.geolocation.watchPosition(
     (pos) => {
-      state.lastPos = {
-        lat: pos.coords.latitude,
-        lng: pos.coords.longitude,
-        accuracy: Math.round(pos.coords.accuracy),
-        at: pos.timestamp,
-      };
-      saveState();
-      toast(`定位成功！精度 ±${state.lastPos.accuracy} 米`);
-      route();
+      if (!best || pos.coords.accuracy < best.coords.accuracy) best = pos;
+      if (best.coords.accuracy <= 30) succeed(); // 精度足够好，提前结束
     },
     (err) => {
-      const msg = err.code === 1 ? '定位权限被拒绝，请在浏览器中允许位置权限'
-        : err.code === 3 ? '定位超时，请到开阔处或开启 GPS 后重试'
+      if (best) return; // 已拿到定位，忽略个别失败
+      finished = true;
+      stopWatch();
+      const msg = err.code === 1
+        ? '定位权限被拒绝：请点击浏览器地址栏的 ⚙️/🔒 图标，将位置设为“允许”后重试'
+        : err.code === 3 ? '定位超时：请到开阔处并开启 GPS 后重试'
         : '定位失败，请稍后重试';
       toast(msg);
     },
-    { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 }
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
   );
+  setTimeout(() => {
+    if (finished) return;
+    if (best) succeed();
+    else { finished = true; stopWatch(); toast('定位超时：请确认设备定位服务已开启'); }
+  }, 18000);
+}
+
+/* 查询浏览器定位权限状态 */
+async function locPermState() {
+  try {
+    return (await navigator.permissions.query({ name: 'geolocation' })).state;
+  } catch {
+    return 'unknown';
+  }
+}
+
+/* 首次进入发现页时自动打开定位（每次会话最多一次） */
+async function maybeAutoLocate() {
+  if (state.lastPos) return;
+  try { if (sessionStorage.getItem('pashanqu.locTried')) return; } catch { /* 隐私模式下忽略 */ }
+  try { sessionStorage.setItem('pashanqu.locTried', '1'); } catch { /* 同上 */ }
+  const st = await locPermState();
+  if (st === 'granted' || st === 'prompt' || st === 'unknown') requestLocation();
 }
 
 /* ================= 存储 ================= */
 const STORE_KEY = 'pashanqu.v1';
+
+const okAvatar = (v) =>
+  typeof v === 'string' && (v.startsWith('data:image/') ? v.length < 400000 : v.length > 0 && v.length <= 4);
+
+const avatarHtml = (a) => (a && a.startsWith('data:')) ? `<img src="${a}" alt="头像">` : (a || '🧗');
+
+/* 把用户照片裁剪压缩为 128×128 的头像 dataURL */
+function fileToAvatarDataUrl(file, cb) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const size = 128;
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const s = Math.min(img.width, img.height);
+      ctx.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, size, size);
+      cb(canvas.toDataURL('image/jpeg', 0.82));
+    };
+    img.onerror = () => cb(null);
+    img.src = reader.result;
+  };
+  reader.onerror = () => cb(null);
+  reader.readAsDataURL(file);
+}
 
 const defaultState = () => ({
   nickname: '山中客',
@@ -109,7 +168,7 @@ let state = (() => {
     return {
       ...d,
       nickname: typeof p.nickname === 'string' && p.nickname.trim() ? p.nickname.trim().slice(0, 16) : d.nickname,
-      avatar: typeof p.avatar === 'string' && p.avatar ? p.avatar.slice(0, 4) : d.avatar,
+      avatar: okAvatar(p.avatar) ? p.avatar : d.avatar,
       motto: typeof p.motto === 'string' && p.motto.trim() ? p.motto.trim().slice(0, 30) : d.motto,
       joinedAt: Number.isFinite(p.joinedAt) ? p.joinedAt : d.joinedAt,
       lastPos: p.lastPos && Number.isFinite(p.lastPos.lat) && Number.isFinite(p.lastPos.lng) ? p.lastPos : null,
@@ -253,9 +312,10 @@ function mountainCard(m) {
 }
 
 function mountainMini(m) {
+  const d = distToMountain(m);
   return `
   <div class="m-mini" role="button" tabindex="0" aria-label="${esc(m.name)}" data-action="open-mountain" data-id="${m.id}">
-    <div class="art">${mountainScene(m)}</div>
+    <div class="art">${mountainScene(m)}${d !== null ? `<span class="dist-tag">📍 ${fmtDist(d)}</span>` : ''}</div>
     <div class="body">
       <div class="name">${m.emoji} ${esc(m.name)}</div>
       <div class="sub">${esc(m.province)} · ${fmtNum(m.elevation)}m</div>
@@ -364,6 +424,16 @@ function viewExplore() {
     </button>
   </div>
 
+  ${!state.lastPos ? `
+  <div class="loc-banner" id="loc-banner" data-status="loading">
+    <span class="lb-icon" aria-hidden="true">📍</span>
+    <div class="lb-txt">
+      <b>打开定位功能</b>
+      <small id="loc-banner-sub">显示每座山与你的实时距离，还能按“离我最近”排序</small>
+    </div>
+    <button type="button" class="btn btn-primary lb-btn" data-action="locate">立即定位</button>
+  </div>` : ''}
+
   <div class="filter-label">难度</div>
   <div class="chips-row">
     ${DIFFS.map((d) => `<button type="button" class="chip ${exploreState.diff === d.key ? 'on' : ''}" data-action="f-diff" data-key="${d.key}" aria-pressed="${exploreState.diff === d.key}">${d.label}</button>`).join('')}
@@ -401,6 +471,7 @@ function viewMountain(m) {
   const s = computeStats();
   const climbed = s.ids.has(m.id);
   const times = state.records.filter((r) => r.mountainId === m.id).length;
+  const d = distToMountain(m);
   return `
   <div class="detail-hero">
     <div class="scene-wrap">${mountainScene(m)}</div>
@@ -422,6 +493,16 @@ function viewMountain(m) {
     <div class="st"><b>${m.duration.replace(/（.*?）/, '')}</b><span>参考耗时</span></div>
     <div class="st"><b>${m.distance}km</b><span>路线里程</span></div>
   </div>
+
+  ${d !== null ? `
+  <div class="dist-banner">
+    <span>📍 这座山距你约 <b>${fmtDist(d)}</b>（直线距离）</span>
+    <button type="button" class="chip" data-action="locate" style="padding:3px 11px;font-size:11.5px">重新定位</button>
+  </div>` : `
+  <div class="dist-banner dim">
+    <span>📍 打开定位，查看这座山与你的距离</span>
+    <button type="button" class="chip" data-action="locate" style="padding:3px 11px;font-size:11.5px">立即定位</button>
+  </div>`}
 
   ${climbed ? `
   <div class="my-climb-banner">
@@ -487,7 +568,7 @@ function viewProfile() {
   const days = Math.max(1, Math.ceil((Date.now() - (state.joinedAt || Date.now())) / 864e5));
   return `
   <div class="me-card" role="button" tabindex="0" aria-label="编辑资料" data-action="edit-profile" title="编辑资料">
-    <div class="avatar">${state.avatar}</div>
+    <div class="avatar">${avatarHtml(state.avatar)}</div>
     <div class="me-info">
       <div class="nick">${esc(state.nickname)} <span class="edit-hint">✏️ 编辑资料</span></div>
       <div class="motto">${esc(state.motto)} · 已同行 ${days} 天</div>
@@ -547,6 +628,19 @@ function route() {
   const tab = $(`.tab[data-tab="${name}"]`) || $(`.tab[data-tab="home"]`);
   tab.classList.add('on');
   if (name !== 'explore') window.scrollTo(0, 0);
+
+  if (name === 'explore' && !state.lastPos) {
+    maybeAutoLocate();
+    locPermState().then((st) => {
+      const banner = $('#loc-banner');
+      if (!banner) return;
+      banner.dataset.status = st;
+      const sub = $('#loc-banner-sub');
+      if (st === 'denied' && sub) {
+        sub.textContent = '权限已被浏览器拒绝：点击地址栏左侧 ⚙️/🔒 图标，把“位置”设为允许后刷新页面';
+      }
+    });
+  }
 }
 
 /* ================= 弹窗：打卡 ================= */
@@ -612,7 +706,14 @@ function openProfileModal() {
         <button class="m-close" data-action="close-modal">✕</button>
       </div>
       <div class="form-row">
-        <label>头像</label>
+        <label>头像（支持自定义照片）</label>
+        <div class="pf-ava-row">
+          <div class="pf-preview" id="pf-preview">${avatarHtml(editingAvatar)}</div>
+          <div class="pf-ava-btns">
+            <button type="button" class="btn btn-ghost" data-action="pick-photo">📷 上传照片</button>
+            <button type="button" class="btn btn-ghost" data-action="reset-ava">😀 用表情头像</button>
+          </div>
+        </div>
         <div class="ava-grid" id="pf-avatars">
           ${AVATARS.map((a) => `<button type="button" class="ava-opt ${a === editingAvatar ? 'on' : ''}" data-ava="${a}">${a}</button>`).join('')}
         </div>
@@ -636,7 +737,7 @@ function saveProfile() {
   if (!nick) { toast('昵称不能为空'); return; }
   state.nickname = nick.slice(0, 16);
   state.motto = motto.slice(0, 30) || defaultState().motto;
-  if (editingAvatar) state.avatar = editingAvatar;
+  if (editingAvatar && okAvatar(editingAvatar)) state.avatar = editingAvatar;
   saveState();
   closeModal();
   route();
@@ -654,7 +755,7 @@ function applyImport(data) {
   const d = defaultState();
   state = {
     nickname: typeof data.nickname === 'string' && data.nickname.trim() ? data.nickname.trim().slice(0, 16) : d.nickname,
-    avatar: typeof data.avatar === 'string' && data.avatar ? data.avatar.slice(0, 4) : d.avatar,
+    avatar: okAvatar(data.avatar) ? data.avatar : d.avatar,
     motto: typeof data.motto === 'string' && data.motto.trim() ? data.motto.trim().slice(0, 30) : d.motto,
     joinedAt: Number.isFinite(data.joinedAt) ? data.joinedAt : d.joinedAt,
     lastPos: data.lastPos && Number.isFinite(data.lastPos.lat) && Number.isFinite(data.lastPos.lng) ? data.lastPos : null,
@@ -764,6 +865,32 @@ function handleAction(t) {
       break;
     case 'save-profile':
       saveProfile();
+      break;
+    case 'pick-photo': {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = () => {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) { toast('请选择图片文件 📷'); return; }
+        if (file.size > 8 * 1024 * 1024) { toast('图片太大，请选择 8MB 以内的图片'); return; }
+        fileToAvatarDataUrl(file, (url) => {
+          if (!url) { toast('图片读取失败，请换一张试试'); return; }
+          editingAvatar = url;
+          const pv = $('#pf-preview');
+          if (pv) pv.innerHTML = avatarHtml(url);
+          $$('#pf-avatars .ava-opt').forEach((b) => b.classList.remove('on'));
+          toast('照片已就绪，点击“保存资料”生效 ✅');
+        });
+      };
+      input.click();
+      break;
+    }
+    case 'reset-ava':
+      editingAvatar = '🧗';
+      { const pv = $('#pf-preview'); if (pv) pv.innerHTML = avatarHtml(editingAvatar); }
+      $$('#pf-avatars .ava-opt').forEach((b) => b.classList.toggle('on', b.dataset.ava === editingAvatar));
       break;
     case 'del-record':
       if (confirm('确定删除这条打卡记录吗？')) {
