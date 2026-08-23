@@ -343,3 +343,22 @@ const DIFFS = [
 ];
 const DIFF_LABELS = { 1: '休闲', 2: '轻松', 3: '进阶', 4: '困难', 5: '挑战' };
 const WUYUE_IDS = ['taishan', 'huashan', 'hengshan_s', 'hengshan_n', 'songshan'];
+
+/* 山峰坐标 [纬度, 经度]（山顶/主峰附近，用于距离计算） */
+const COORDS = {
+  taishan: [36.257, 117.101],
+  huashan: [34.475, 110.085],
+  huangshan: [30.131, 118.160],
+  emeishan: [29.523, 103.332],
+  wugongshan: [27.465, 114.175],
+  xiangshan: [39.992, 116.190],
+  yuelushan: [28.185, 112.937],
+  baiyunshan: [23.182, 113.297],
+  qingchengshan: [30.898, 103.563],
+  lushan: [29.565, 115.976],
+  tianmenshan: [29.052, 110.498],
+  siguniangshan: [31.102, 102.897],
+  hengshan_n: [39.674, 113.736],
+  hengshan_s: [27.256, 112.683],
+  songshan: [34.490, 113.040],
+};

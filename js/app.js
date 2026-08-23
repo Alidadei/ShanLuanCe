@@ -34,22 +34,89 @@ const todayStr = () => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };
 
+/* ================= 定位与距离 ================= */
+const haversine = (lat1, lng1, lat2, lng2) => {
+  const R = 6371, rad = Math.PI / 180;
+  const dLat = (lat2 - lat1) * rad, dLng = (lng2 - lng1) * rad;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+};
+
+const distToMountain = (m) => {
+  if (!state.lastPos) return null;
+  const c = COORDS[m.id];
+  return c ? haversine(state.lastPos.lat, state.lastPos.lng, c[0], c[1]) : null;
+};
+
+const fmtDist = (km) =>
+  km < 1 ? `${Math.round(km * 1000)} m`
+  : km < 100 ? `${km.toFixed(1)} km`
+  : `${fmtNum(Math.round(km))} km`;
+
+function nearestMountain() {
+  if (!state.lastPos) return null;
+  let best = null, bestD = Infinity;
+  for (const m of MOUNTAINS) {
+    const d = distToMountain(m);
+    if (d !== null && d < bestD) { bestD = d; best = m; }
+  }
+  return best ? { m: best, d: bestD } : null;
+}
+
+function requestLocation() {
+  if (!navigator.geolocation) { toast('当前浏览器不支持定位 📵'); return; }
+  toast('正在精确定位…');
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      state.lastPos = {
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude,
+        accuracy: Math.round(pos.coords.accuracy),
+        at: pos.timestamp,
+      };
+      saveState();
+      toast(`定位成功！精度 ±${state.lastPos.accuracy} 米`);
+      route();
+    },
+    (err) => {
+      const msg = err.code === 1 ? '定位权限被拒绝，请在浏览器中允许位置权限'
+        : err.code === 3 ? '定位超时，请到开阔处或开启 GPS 后重试'
+        : '定位失败，请稍后重试';
+      toast(msg);
+    },
+    { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 }
+  );
+}
+
 /* ================= 存储 ================= */
 const STORE_KEY = 'pashanqu.v1';
 
-const defaultState = () => ({ nickname: '山中客', records: [] });
+const defaultState = () => ({
+  nickname: '山中客',
+  avatar: '🧗',
+  motto: '山不在高，爬了就行 ⛰️',
+  joinedAt: Date.now(),
+  records: [],
+  lastPos: null,
+});
 
 let state = (() => {
+  const d = defaultState();
   try {
     const raw = localStorage.getItem(STORE_KEY);
-    if (!raw) return defaultState();
-    const parsed = JSON.parse(raw);
+    if (!raw) return d;
+    const p = JSON.parse(raw);
     return {
-      nickname: typeof parsed.nickname === 'string' && parsed.nickname.trim() ? parsed.nickname : '山中客',
-      records: Array.isArray(parsed.records) ? parsed.records : [],
+      ...d,
+      nickname: typeof p.nickname === 'string' && p.nickname.trim() ? p.nickname.trim().slice(0, 16) : d.nickname,
+      avatar: typeof p.avatar === 'string' && p.avatar ? p.avatar.slice(0, 4) : d.avatar,
+      motto: typeof p.motto === 'string' && p.motto.trim() ? p.motto.trim().slice(0, 30) : d.motto,
+      joinedAt: Number.isFinite(p.joinedAt) ? p.joinedAt : d.joinedAt,
+      lastPos: p.lastPos && Number.isFinite(p.lastPos.lat) && Number.isFinite(p.lastPos.lng) ? p.lastPos : null,
+      records: Array.isArray(p.records) ? p.records : [],
     };
   } catch {
-    return defaultState();
+    return d;
   }
 })();
 
@@ -170,9 +237,10 @@ function diffDots(d) {
 const starRow = (n) => '★'.repeat(n) + '☆'.repeat(5 - n);
 
 function mountainCard(m) {
+  const d = distToMountain(m);
   return `
   <div class="m-card" role="button" tabindex="0" aria-label="${esc(m.name)}" data-action="open-mountain" data-id="${m.id}">
-    <div class="art">${mountainScene(m)}<span class="elev-tag">${fmtNum(m.elevation)}m</span></div>
+    <div class="art">${mountainScene(m)}${d !== null ? `<span class="dist-tag">📍 ${fmtDist(d)}</span>` : ''}<span class="elev-tag">${fmtNum(m.elevation)}m</span></div>
     <div class="body">
       <div class="name"><span>${m.emoji}</span>${esc(m.name)}</div>
       <div class="loc">${esc(m.province)}</div>
@@ -214,7 +282,7 @@ function feedItem(r, { deletable = false } = {}) {
         <span>${esc(r.date)}${r.duration ? ` · 用时 ${r.duration} 小时` : ''}</span>
         <span style="display:flex;align-items:center;gap:8px">
           <span class="stars">${starRow(r.rating)}</span>
-          ${deletable ? `<button class="del" data-action="del-record" data-id="${r.id}" title="删除记录">✕</button>` : ''}
+          ${deletable ? `<button class="del" data-action="del-record" data-id="${r.id}" title="删除记录" aria-label="删除记录">✕</button>` : ''}
         </span>
       </div>
     </div>
@@ -224,6 +292,7 @@ function feedItem(r, { deletable = false } = {}) {
 /* ================= 视图：首页 ================= */
 function viewHome() {
   const s = computeStats();
+  const near = nearestMountain();
   const featured = [...MOUNTAINS].sort((a, b) => b.scenery - a.scenery).slice(0, 6);
   const themes = ['看日出', '夜爬', '云海', '红叶', '高山草甸', '佛教名山', '道教名山', '五岳'];
   const latest = sortedRecords().slice(0, 3);
@@ -240,6 +309,7 @@ function viewHome() {
           <div class="hstat"><b>${s.distinct}</b><span>登顶山峰</span></div>
           <div class="hstat"><b>${fmtNum(s.elev)}m</b><span>累计海拔</span></div>
         </div>
+        ${near ? `<div class="near-line">📍 离你最近：${esc(near.m.name)} · 约 ${fmtDist(near.d)}</div>` : ''}
       </div>
     </div>
   </div>
@@ -276,7 +346,9 @@ function filteredMountains() {
   if (exploreState.tag) list = list.filter((m) => m.tags.includes(exploreState.tag));
   if (exploreState.sort === 'elev') list.sort((a, b) => b.elevation - a.elevation);
   else if (exploreState.sort === 'easy') list.sort((a, b) => a.difficulty - b.difficulty || b.scenery - a.scenery);
-  else list.sort((a, b) => b.scenery - a.scenery);
+  else if (exploreState.sort === 'near' && state.lastPos) {
+    list.sort((a, b) => (distToMountain(a) ?? Infinity) - (distToMountain(b) ?? Infinity));
+  } else list.sort((a, b) => b.scenery - a.scenery);
   return list;
 }
 
@@ -286,6 +358,10 @@ function viewExplore() {
   <div class="search-bar">
     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
     <input id="explore-search" type="search" placeholder="搜山名、地区或标签…" value="${esc(exploreState.q)}">
+    <button type="button" class="loc-btn ${state.lastPos ? 'on' : ''}" data-action="locate" title="${state.lastPos ? `已定位（精度 ±${state.lastPos.accuracy} 米），点击重新定位` : '精确定位我的位置'}">
+      <span aria-hidden="true">📍</span>
+      <small>${state.lastPos ? `±${state.lastPos.accuracy}m` : '定位'}</small>
+    </button>
   </div>
 
   <div class="filter-label">难度</div>
@@ -304,6 +380,7 @@ function viewExplore() {
       <option value="hot" ${exploreState.sort === 'hot' ? 'selected' : ''}>人气推荐</option>
       <option value="elev" ${exploreState.sort === 'elev' ? 'selected' : ''}>海拔最高</option>
       <option value="easy" ${exploreState.sort === 'easy' ? 'selected' : ''}>难度最低</option>
+      <option value="near" ${exploreState.sort === 'near' ? 'selected' : ''}>离我最近 📍</option>
     </select>
   </div>
 
@@ -407,14 +484,13 @@ function viewRecords() {
 function viewProfile() {
   const s = computeStats();
   const unlocked = new Set(unlockedIds());
+  const days = Math.max(1, Math.ceil((Date.now() - (state.joinedAt || Date.now())) / 864e5));
   return `
-  <div class="me-card">
-    <div class="avatar">🧗</div>
+  <div class="me-card" role="button" tabindex="0" aria-label="编辑资料" data-action="edit-profile" title="编辑资料">
+    <div class="avatar">${state.avatar}</div>
     <div class="me-info">
-      <div class="nick">${esc(state.nickname)}
-        <button data-action="edit-nick" title="修改昵称">✏️</button>
-      </div>
-      <div class="motto">山不在高，爬了就行 ⛰️</div>
+      <div class="nick">${esc(state.nickname)} <span class="edit-hint">✏️ 编辑资料</span></div>
+      <div class="motto">${esc(state.motto)} · 已同行 ${days} 天</div>
     </div>
   </div>
 
@@ -437,12 +513,13 @@ function viewProfile() {
     </div>`).join('')}
   </div>
 
-  <div class="section-title">数据管理</div>
+  <div class="section-title">数据管理 <small>资料与记录永久保留在本机</small></div>
   <div class="data-zone">
     <button class="btn btn-ghost" data-action="export">⬇️ 导出备份</button>
-    <button class="btn btn-danger-ghost" data-action="clear">🗑️ 清空数据</button>
+    <button class="btn btn-ghost" data-action="import">⬆️ 导入恢复</button>
+    <button class="btn btn-danger-ghost" data-action="clear">🗑️ 清空记录</button>
   </div>
-  <div style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:22px">爬山趣 v1.0 · 数据仅保存在本机浏览器</div>
+  <div style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:22px">爬山趣 v1.1 · 数据仅保存在本机浏览器</div>
   `;
 }
 
@@ -519,6 +596,81 @@ function openCheckinModal(mountainId = null) {
 
 function closeModal() {
   $('#modal-root').innerHTML = '';
+}
+
+/* ================= 弹窗：编辑资料 ================= */
+const AVATARS = ['🧗', '⛰️', '🥾', '🎒', '🧭', '⛺', '🔥', '🌅', '🍁', '🐘', '🦌', '🦅'];
+let editingAvatar = null;
+
+function openProfileModal() {
+  editingAvatar = state.avatar;
+  $('#modal-root').innerHTML = `
+  <div class="modal-mask" data-action="close-modal-bg">
+    <div class="modal-sheet" data-stop="1">
+      <div class="m-head">
+        <h3>✏️ 编辑资料</h3>
+        <button class="m-close" data-action="close-modal">✕</button>
+      </div>
+      <div class="form-row">
+        <label>头像</label>
+        <div class="ava-grid" id="pf-avatars">
+          ${AVATARS.map((a) => `<button type="button" class="ava-opt ${a === editingAvatar ? 'on' : ''}" data-ava="${a}">${a}</button>`).join('')}
+        </div>
+      </div>
+      <div class="form-row">
+        <label>昵称</label>
+        <input id="pf-nick" class="control" type="text" maxlength="16" value="${esc(state.nickname)}" placeholder="给自己起个登山昵称">
+      </div>
+      <div class="form-row">
+        <label>个性签名</label>
+        <input id="pf-motto" class="control" type="text" maxlength="30" value="${esc(state.motto)}" placeholder="一句话说说你和山的故事">
+      </div>
+      <button class="btn btn-primary btn-block" data-action="save-profile">✓ 保存资料</button>
+    </div>
+  </div>`;
+}
+
+function saveProfile() {
+  const nick = ($('#pf-nick')?.value || '').trim();
+  const motto = ($('#pf-motto')?.value || '').trim();
+  if (!nick) { toast('昵称不能为空'); return; }
+  state.nickname = nick.slice(0, 16);
+  state.motto = motto.slice(0, 30) || defaultState().motto;
+  if (editingAvatar) state.avatar = editingAvatar;
+  saveState();
+  closeModal();
+  route();
+  toast('资料已保存 ✅');
+}
+
+/* ================= 备份导入 ================= */
+function applyImport(data) {
+  if (!data || typeof data !== 'object') { toast('备份文件格式不正确'); return; }
+  const recs = Array.isArray(data.records)
+    ? data.records.filter((r) => r && typeof r.mountainId === 'string' && mountainById(r.mountainId) && typeof r.date === 'string')
+    : [];
+  if (!recs.length && typeof data.nickname !== 'string') { toast('备份文件里没有可导入的数据'); return; }
+  if (!confirm(`将导入 ${recs.length} 条打卡记录并覆盖当前数据，确定吗？`)) return;
+  const d = defaultState();
+  state = {
+    nickname: typeof data.nickname === 'string' && data.nickname.trim() ? data.nickname.trim().slice(0, 16) : d.nickname,
+    avatar: typeof data.avatar === 'string' && data.avatar ? data.avatar.slice(0, 4) : d.avatar,
+    motto: typeof data.motto === 'string' && data.motto.trim() ? data.motto.trim().slice(0, 30) : d.motto,
+    joinedAt: Number.isFinite(data.joinedAt) ? data.joinedAt : d.joinedAt,
+    lastPos: data.lastPos && Number.isFinite(data.lastPos.lat) && Number.isFinite(data.lastPos.lng) ? data.lastPos : null,
+    records: recs.map((r, i) => ({
+      id: typeof r.id === 'string' ? r.id : 'imp' + Date.now() + '-' + i,
+      mountainId: r.mountainId,
+      date: r.date,
+      duration: Number.isFinite(+r.duration) && +r.duration > 0 ? +r.duration : null,
+      rating: Math.min(5, Math.max(1, Math.round(+r.rating) || 5)),
+      notes: typeof r.notes === 'string' ? r.notes.slice(0, 300) : '',
+      createdAt: Number.isFinite(r.createdAt) ? r.createdAt : Date.now(),
+    })),
+  };
+  saveState();
+  route();
+  toast(`导入成功，${state.records.length} 条记录已恢复 🎉`);
 }
 
 function saveRecord() {
@@ -604,6 +756,15 @@ function handleAction(t) {
     case 'save-record':
       saveRecord();
       break;
+    case 'locate':
+      requestLocation();
+      break;
+    case 'edit-profile':
+      openProfileModal();
+      break;
+    case 'save-profile':
+      saveProfile();
+      break;
     case 'del-record':
       if (confirm('确定删除这条打卡记录吗？')) {
         state.records = state.records.filter((r) => r.id !== t.dataset.id);
@@ -612,16 +773,6 @@ function handleAction(t) {
         toast('记录已删除');
       }
       break;
-    case 'edit-nick': {
-      const name = prompt('给自己起个登山昵称吧：', state.nickname);
-      if (name && name.trim()) {
-        state.nickname = name.trim().slice(0, 16);
-        saveState();
-        route();
-        toast('昵称已更新 ✅');
-      }
-      break;
-    }
     case 'export': {
       const blob = new Blob([JSON.stringify({ app: '爬山趣', exportedAt: new Date().toISOString(), ...state }, null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
@@ -632,12 +783,33 @@ function handleAction(t) {
       toast('备份已导出 ⬇️');
       break;
     }
+    case 'import': {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'application/json,.json';
+      input.onchange = () => {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            applyImport(JSON.parse(reader.result));
+          } catch {
+            toast('备份文件格式不正确');
+          }
+        };
+        reader.readAsText(file, 'utf-8');
+      };
+      input.click();
+      break;
+    }
     case 'clear':
-      if (confirm('确定清空所有打卡记录吗？此操作不可恢复！')) {
-        state = defaultState();
+      if (confirm('确定清空所有打卡记录吗？（个人资料会保留）')) {
+        state.records = [];
+        state.lastPos = null;
         saveState();
         route();
-        toast('数据已清空');
+        toast('记录已清空，资料已保留');
       }
       break;
   }
@@ -667,6 +839,14 @@ document.addEventListener('click', (e) => {
   $$('#ck-stars button').forEach((btn) => btn.classList.toggle('on', parseInt(btn.dataset.rate, 10) <= modalRate));
 });
 
+/* 资料弹窗头像选择 */
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('#pf-avatars [data-ava]');
+  if (!b) return;
+  editingAvatar = b.dataset.ava;
+  $$('#pf-avatars .ava-opt').forEach((btn) => btn.classList.toggle('on', btn.dataset.ava === editingAvatar));
+});
+
 /* 发现页搜索与排序 */
 document.addEventListener('input', (e) => {
   if (e.target.id === 'explore-search') {
@@ -687,6 +867,7 @@ document.addEventListener('change', (e) => {
   if (e.target.id === 'explore-sort') {
     exploreState.sort = e.target.value;
     route();
+    if (e.target.value === 'near' && !state.lastPos) requestLocation();
   }
 });
 
