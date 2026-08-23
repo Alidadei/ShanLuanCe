@@ -157,6 +157,7 @@ const defaultState = () => ({
   joinedAt: Date.now(),
   records: [],
   lastPos: null,
+  chats: [],
 });
 
 let state = (() => {
@@ -173,6 +174,7 @@ let state = (() => {
       joinedAt: Number.isFinite(p.joinedAt) ? p.joinedAt : d.joinedAt,
       lastPos: p.lastPos && Number.isFinite(p.lastPos.lat) && Number.isFinite(p.lastPos.lng) ? p.lastPos : null,
       records: Array.isArray(p.records) ? p.records : [],
+      chats: Array.isArray(p.chats) ? p.chats.filter((c) => c && typeof c.text === 'string' && (c.role === 'user' || c.role === 'bot')).slice(-60) : [],
     };
   } catch {
     return d;
@@ -234,16 +236,16 @@ function mountainScene(m) {
       </linearGradient>
     </defs>
     <rect width="400" height="190" fill="url(#${id})"/>
-    <circle cx="${sunX}" cy="${sunY}" r="19" fill="#fff6dd" opacity=".92"/>
-    <circle cx="${sunX}" cy="${sunY}" r="30" fill="#fff6dd" opacity=".18"/>
-    <g fill="rgba(255,255,255,.5)">
+    <circle class="sun" cx="${sunX}" cy="${sunY}" r="19" fill="#fff6dd" opacity=".92"/>
+    <circle class="sun-halo" cx="${sunX}" cy="${sunY}" r="30" fill="#fff6dd" opacity=".18"/>
+    <g class="clouds cl1" fill="rgba(255,255,255,.5)">
       <ellipse cx="${(sunX + 150) % 360 + 20}" cy="36" rx="34" ry="8"/>
       <ellipse cx="${(sunX + 150) % 360 + 40}" cy="42" rx="22" ry="6"/>
-      <ellipse cx="${(sunX + 290) % 340 + 20}" cy="66" rx="26" ry="6"/>
     </g>
+    <g class="clouds cl2" fill="rgba(255,255,255,.5)"><ellipse cx="${(sunX + 290) % 340 + 20}" cy="66" rx="26" ry="6"/></g>
     <path fill="${back}" opacity=".92" d="M-10,152 L52,76 L94,110 L148,42 L204,114 L252,82 L300,142 L346,106 L410,152 L410,200 L-10,200 Z"/>
     <path fill="${front}" d="M-10,176 L58,122 L118,164 L184,98 L252,160 L314,124 L372,168 L410,142 L410,200 L-10,200 Z"/>
-    <g stroke="rgba(255,255,255,.85)" fill="none" stroke-width="2" stroke-linecap="round">
+    <g class="birds" stroke="rgba(255,255,255,.85)" fill="none" stroke-width="2" stroke-linecap="round">
       <path d="M${(sunX + 60) % 300 + 40},56 q6,-7 12,0 M${(sunX + 60) % 300 + 58},48 q6,-7 12,0"/>
     </g>
   </svg>`;
@@ -356,12 +358,15 @@ function viewHome() {
   const featured = [...MOUNTAINS].sort((a, b) => b.scenery - a.scenery).slice(0, 6);
   const themes = ['看日出', '夜爬', '云海', '红叶', '高山草甸', '佛教名山', '道教名山', '五岳'];
   const latest = sortedRecords().slice(0, 3);
+  const brief = agentBriefing();
+  const h = new Date().getHours();
+  const dayEmoji = h < 6 || h >= 19 ? '🌙' : h < 11 ? '🌅' : h < 15 ? '☀️' : '🌤️';
   return `
   <div class="hero">
     <div class="scene-wrap">
       ${mountainScene({ id: 'hero', colors: ['#1b4332', '#52b788', '#2d6a4f', '#123527'] })}
       <div class="hero-content">
-        <div class="hello">你好，${esc(state.nickname)} 🌤️</div>
+        <div class="hello">你好，${esc(state.nickname)} ${dayEmoji}</div>
         <h1>爬山趣</h1>
         <div class="slogan">会当凌绝顶，一览众山小</div>
         <div class="hero-stats">
@@ -372,6 +377,16 @@ function viewHome() {
         ${near ? `<div class="near-line">📍 离你最近：${esc(near.m.name)} · 约 ${fmtDist(near.d)}</div>` : ''}
       </div>
     </div>
+  </div>
+
+  <div class="brief-card">
+    <div class="brief-head">
+      <span class="brief-ava" aria-hidden="true">🏔️</span>
+      <div class="brief-title"><b>山灵说</b><small>AI 登山搭子</small></div>
+      <button type="button" class="chip" data-action="open-chat">💬 聊聊</button>
+    </div>
+    <p class="brief-text">${esc(brief.text).replace(/\n/g, '<br>')}</p>
+    ${brief.rec ? chatCard(brief.rec.m.id) : ''}
   </div>
 
   <div class="section-title">为你推荐 <small>风景评分最高</small></div>
@@ -566,6 +581,9 @@ function viewProfile() {
   const s = computeStats();
   const unlocked = new Set(unlockedIds());
   const days = Math.max(1, Math.ceil((Date.now() - (state.joinedAt || Date.now())) / 864e5));
+  const firstClimb = new Map();
+  for (const r of sortedRecords()) if (!firstClimb.has(r.mountainId)) firstClimb.set(r.mountainId, r.date);
+  const climbedCount = firstClimb.size;
   return `
   <div class="me-card" role="button" tabindex="0" aria-label="编辑资料" data-action="edit-profile" title="编辑资料">
     <div class="avatar">${avatarHtml(state.avatar)}</div>
@@ -594,13 +612,27 @@ function viewProfile() {
     </div>`).join('')}
   </div>
 
+  <div class="section-title">山峰护照 <small>${climbedCount}/${MOUNTAINS.length} 已集章</small></div>
+  <div class="passport">
+    ${MOUNTAINS.map((m) => {
+      const date = firstClimb.get(m.id);
+      return date
+        ? `<div class="seal" role="button" tabindex="0" data-action="open-mountain" data-id="${m.id}" title="${esc(m.name)} · ${date}">
+            <span class="seal-emoji">${m.emoji}</span><span class="seal-name">${esc(m.name)}</span><span class="seal-date">巅·${date.slice(5).replace('-', '.')}</span>
+          </div>`
+        : `<div class="seal seal-empty" role="button" tabindex="0" data-action="open-mountain" data-id="${m.id}" title="${esc(m.name)} · 待登顶">
+            <span class="seal-emoji">${m.emoji}</span><span class="seal-name">${esc(m.name)}</span><span class="seal-date">待登顶</span>
+          </div>`;
+    }).join('')}
+  </div>
+
   <div class="section-title">数据管理 <small>资料与记录永久保留在本机</small></div>
   <div class="data-zone">
     <button class="btn btn-ghost" data-action="export">⬇️ 导出备份</button>
     <button class="btn btn-ghost" data-action="import">⬆️ 导入恢复</button>
     <button class="btn btn-danger-ghost" data-action="clear">🗑️ 清空记录</button>
   </div>
-  <div style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:22px">爬山趣 v1.1 · 数据仅保存在本机浏览器</div>
+  <div style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:22px">爬山趣 v1.3 · 山灵 powered · 数据仅保存在本机</div>
   `;
 }
 
@@ -617,9 +649,14 @@ function route() {
   if (mdetail && mountainById(mdetail[1])) {
     page.innerHTML = viewMountain(mountainById(mdetail[1]));
     tabbar.classList.add('hidden');
+    const fab = $('#chat-fab');
+    if (fab) fab.classList.add('hide');
     window.scrollTo(0, 0);
     return;
   }
+
+  const fab = $('#chat-fab');
+  if (fab) fab.classList.remove('hide');
 
   const name = (hash.replace('#/', '').split('/'))[0] || 'home';
   const view = VIEWS[name] || viewHome;
@@ -794,6 +831,7 @@ function saveRecord() {
   });
   saveState();
   closeModal();
+  confetti();
   toast(`打卡成功！登顶 ${m.name} ${m.emoji}`);
 
   const after = unlockedIds().filter((id) => !before.has(id));
@@ -807,7 +845,260 @@ function saveRecord() {
   else if (hash.startsWith('#/records') || hash.startsWith('#/home')) route();
 }
 
-/* ================= Toast ================= */
+/* ================= 山灵 · AI 登山搭子 ================= */
+const QUICK_QUESTIONS = ['想看云海去哪？', '带爸妈休闲爬，求推荐', '周末两天能去哪？', '想挑战 5000 米雪山', '离我近的有哪些？', '我打卡几次了？'];
+
+const TAG_SEASON = { 红叶: [9, 10, 11], 草甸: [5, 6, 9, 10], 雪山: [5, 6, 9, 10], 云海: [3, 4, 5, 9, 10, 11], 星空: [6, 7, 8, 9] };
+
+function parseIntent(t) {
+  return {
+    easy: /轻松|休闲|简单|新手|带娃|爸妈|父母|老人|亲子|遛弯|小白|入门/.test(t),
+    hard: /挑战|硬核|雪山|大佬|高手|征服|进阶|难度高|5000|五千米/.test(t),
+    near: /附近|周边|离我|最近|近一点|不远/.test(t),
+    interests: ['日出', '云海', '红叶', '草甸', '露营', '星空', '佛教', '道教', '瀑布', '索道', '夜爬', '雪山', '温泉', '亲子'].filter((k) => t.includes(k)),
+    region: REGIONS.find((r) => r !== '全部' && t.includes(r)),
+    named: MOUNTAINS.find((m) => t.includes(m.name.replace('大峰', ''))),
+  };
+}
+
+function recommendMountains(intent, n = 3) {
+  const month = new Date().getMonth() + 1;
+  const climbed = computeStats().ids;
+  const scored = MOUNTAINS.map((m) => {
+    let score = m.scenery * 2;
+    const reasons = [];
+    const d = distToMountain(m);
+    if (intent.easy) {
+      if (m.difficulty <= 2) { score += 7; reasons.push(`难度${DIFF_LABELS[m.difficulty]}，很适合休闲出行`); }
+      else if (m.difficulty >= 4) score -= 7;
+    }
+    if (intent.hard) {
+      if (m.difficulty >= 4) { score += 7; reasons.push(`难度${DIFF_LABELS[m.difficulty]}，够劲的挑战`); }
+      else score -= 3;
+      if (m.elevation >= 4000) { score += 3; reasons.push(`海拔 ${fmtNum(m.elevation)} 米，高海拔体验拉满`); }
+    }
+    const hitTags = intent.interests.filter((k) => m.tags.some((tag) => tag.includes(k) || k.includes(tag)));
+    if (hitTags.length) {
+      score += 5 * hitTags.length;
+      reasons.push(`“${hitTags.join('、')}”正是它的招牌`);
+      const ss = TAG_SEASON[hitTags[0]];
+      if (ss && ss.includes(month)) { score += 3; reasons.push(`当前 ${month} 月正当季`); }
+    }
+    if (intent.near) {
+      if (d !== null) {
+        if (d < 200) { score += 8; reasons.push(`距你仅 ${fmtDist(d)}，说走就走`); }
+        else if (d < 600) { score += 3; reasons.push(`距你 ${fmtDist(d)}`); }
+        else score -= 4;
+      } else {
+        reasons.push('打开定位后我能按距离精准推荐');
+      }
+    } else if (d !== null && d < 200) {
+      score += 2;
+      reasons.push(`距你只有 ${fmtDist(d)}`);
+    }
+    if (intent.region && m.region === intent.region) { score += 4; reasons.push(`就在${intent.region}地区`); }
+    if (climbed.has(m.id)) score -= 4;
+    else reasons.push('你还没打卡过');
+    if (!reasons.length) reasons.push(`风景评分 ${m.scenery.toFixed(1)}，经典之选`);
+    return { m, score, d, reasons: reasons.slice(0, 3) };
+  });
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, n);
+}
+
+function nextGoalHint() {
+  const s = computeStats();
+  if (s.distinct < 3) return `再登顶 ${3 - s.distinct} 座即可解锁「渐入佳境」`;
+  if (s.distinct < 5) return `再登顶 ${5 - s.distinct} 座即可解锁「登山达人」`;
+  const left = WUYUE_IDS.filter((id) => !s.ids.has(id));
+  if (left.length) return `五岳还差：${left.map((id) => mountainById(id).name).join('、')}`;
+  if (s.elev < 20000) return `累计登顶海拔还差 ${fmtNum(20000 - s.elev)} 米解锁「海拔收藏家」`;
+  return '阶段性目标全部达成，向着大满贯进发！';
+}
+
+function chatGreeting() {
+  const s = computeStats();
+  const near = nearestMountain();
+  let t = '你好呀，我是山灵 🏔️ 你的 AI 登山搭子。';
+  t += s.count
+    ? `你已登顶 ${s.distinct} 座山、累计爬升 ${fmtNum(s.elev)} 米，脚步不停！`
+    : '手账还是空白的，随时问我“去哪爬”，我来帮你规划。';
+  if (near) t += `现在离你最近的是${near.m.name}（约 ${fmtDist(near.d)}）。`;
+  t += '\n可以问我风景、难度、距离——比如“想看云海去哪？”';
+  return t;
+}
+
+function chatReply(text) {
+  const intent = parseIntent(text);
+  if (/你好|您好|hi|hello|在吗/i.test(text)) return { text: chatGreeting() };
+  if (/谢谢|感谢|辛苦/.test(text)) return { text: '不客气～愿你山高路远，脚步不停 ⛰️ 还想了解哪座山，随时问我。' };
+  if (intent.named) {
+    const m = intent.named;
+    const d = distToMountain(m);
+    const times = state.records.filter((r) => r.mountainId === m.id).length;
+    return {
+      text: `${m.emoji} ${m.name} · ${m.subtitle}\n海拔 ${fmtNum(m.elevation)} 米｜难度 ${DIFF_LABELS[m.difficulty]}（${m.difficulty}/5）｜建议 ${m.duration}${d !== null ? `｜距你约 ${fmtDist(d)}` : ''}${times ? `｜你已打卡 ${times} 次` : ''}\n\n${m.description}\n\n📅 最佳季节：${m.bestSeason}\n💡 ${m.tips[0]}`,
+      cards: [m.id],
+    };
+  }
+  if (/打卡|记录|几次|成就|进度|统计/.test(text)) {
+    const s = computeStats();
+    const un = unlockedIds().length;
+    return { text: `你目前打卡 ${s.count} 次，登顶 ${s.distinct} 座山，累计海拔 ${fmtNum(s.elev)} 米，成就解锁 ${un}/${ACHIEVEMENTS.length} 枚。\n\n🎯 下一步：${nextGoalHint()}` };
+  }
+  const picks = recommendMountains(intent);
+  const intro = intent.easy ? '轻松休闲的路线，我帮你挑了这几座：'
+    : intent.hard ? '想来点硬核的？这几座够你喝一壶：'
+    : intent.near ? '按离你的距离，这几座最方便：'
+    : '根据你的口味，我推荐这几座：';
+  const detail = picks.map((p, i) =>
+    `${i + 1}. ${p.m.emoji} ${p.m.name}（${p.m.province}）\n${p.reasons.map((r) => `   · ${r}`).join('\n')}`
+  ).join('\n');
+  return {
+    text: `${intro}\n\n${detail}\n\n点击卡片可看路线详情，也可以直接问我“XX山怎么爬”。`,
+    cards: picks.map((p) => p.m.id),
+  };
+}
+
+function agentBriefing() {
+  const s = computeStats();
+  const near = nearestMountain();
+  const h = new Date().getHours();
+  const greet = h < 6 ? '夜深了' : h < 11 ? '早上好' : h < 14 ? '中午好' : h < 18 ? '下午好' : '晚上好';
+  const bits = [];
+  if (s.count) bits.push(`你已登顶 ${s.distinct} 座、累计 ${fmtNum(s.elev)} 米。${nextGoalHint()}`);
+  else bits.push('手账还是空白的——不如这个周末就去登顶第一座山');
+  if (near) bits.push(`离你最近的是${near.m.name}（约 ${fmtDist(near.d)}）`);
+  const rec = recommendMountains(parseIntent(''), 1)[0];
+  return { text: `${greet}，${state.nickname}！${bits.join('。')}。今日推荐 ↓`, rec };
+}
+
+/* ================= 山灵 · 聊天界面 ================= */
+const chatCard = (id) => {
+  const m = mountainById(id);
+  if (!m) return '';
+  const d = distToMountain(m);
+  return `
+  <div class="chat-card" role="button" tabindex="0" data-action="open-mountain" data-id="${m.id}">
+    <span class="cc-emoji">${m.emoji}</span>
+    <span class="cc-info"><b>${esc(m.name)}</b><small>${esc(m.province)} · ${fmtNum(m.elevation)}m · ${DIFF_LABELS[m.difficulty]}${d !== null ? ` · ${fmtDist(d)}` : ''}</small></span>
+    <span class="cc-go" aria-hidden="true">›</span>
+  </div>`;
+};
+
+function pushChatMsg(msg) {
+  state.chats.push(msg);
+  if (state.chats.length > 60) state.chats = state.chats.slice(-60);
+  saveState();
+}
+
+const chatBubble = (m) => `
+  <div class="msg ${m.role}">
+    ${m.role === 'bot' ? '<div class="msg-ava">🏔️</div>' : ''}
+    <div class="bubble">${esc(m.text).replace(/\n/g, '<br>')}${(m.cards || []).map(chatCard).join('')}</div>
+  </div>`;
+
+function scrollChat() {
+  const body = $('#chat-body');
+  if (body) body.scrollTop = body.scrollHeight;
+}
+
+function renderChatBody() {
+  const body = $('#chat-body');
+  if (!body) return;
+  body.innerHTML = state.chats.map(chatBubble).join('');
+  scrollChat();
+}
+
+let chatStreamTimer = null;
+
+function streamLastMsg() {
+  const body = $('#chat-body');
+  if (!body || !state.chats.length) return;
+  const last = state.chats[state.chats.length - 1];
+  const nodes = $$('.msg', body);
+  const el = nodes[nodes.length - 1];
+  if (!el || last.role !== 'bot') return;
+  const bubble = $('.bubble', el);
+  const cards = (last.cards || []).map(chatCard).join('');
+  const full = esc(last.text);
+  let i = 0;
+  clearInterval(chatStreamTimer);
+  bubble.innerHTML = '';
+  chatStreamTimer = setInterval(() => {
+    i = Math.min(full.length, i + 2);
+    bubble.innerHTML = full.slice(0, i).replace(/\n/g, '<br>') + (i < full.length ? '<span class="caret"></span>' : cards);
+    scrollChat();
+    if (i >= full.length) clearInterval(chatStreamTimer);
+  }, 16);
+}
+
+function openChat() {
+  if (!state.chats.length) {
+    pushChatMsg({ role: 'bot', text: chatGreeting(), at: Date.now() });
+  }
+  $('#chat-root').innerHTML = `
+  <div class="chat-overlay" role="dialog" aria-label="山灵对话">
+    <div class="chat-head">
+      <div class="ch-ava" aria-hidden="true">🏔️</div>
+      <div class="ch-info"><b>山灵</b><small>AI 登山搭子 · 在线</small></div>
+      <button class="m-close" data-action="close-chat" aria-label="关闭对话">✕</button>
+    </div>
+    <div class="chat-body" id="chat-body"></div>
+    <div class="chat-quick">
+      ${QUICK_QUESTIONS.map((q) => `<button type="button" class="chip" data-action="chat-quick" data-q="${esc(q)}">${esc(q)}</button>`).join('')}
+    </div>
+    <div class="chat-input-bar">
+      <input id="chat-input" type="text" placeholder="问问山灵：想看云海去哪？" maxlength="120">
+      <button type="button" class="btn btn-primary" data-action="chat-send">发送</button>
+    </div>
+  </div>`;
+  renderChatBody();
+}
+
+function closeChat() {
+  clearInterval(chatStreamTimer);
+  $('#chat-root').innerHTML = '';
+}
+
+function sendChat(text) {
+  text = (text || '').trim();
+  if (!text) return;
+  const input = $('#chat-input');
+  if (input) input.value = '';
+  clearInterval(chatStreamTimer);
+  pushChatMsg({ role: 'user', text, at: Date.now() });
+  renderChatBody();
+  const body = $('#chat-body');
+  const typing = document.createElement('div');
+  typing.className = 'msg bot typing';
+  typing.innerHTML = '<div class="msg-ava">🏔️</div><div class="bubble"><i></i><i></i><i></i></div>';
+  body.appendChild(typing);
+  scrollChat();
+  setTimeout(() => {
+    typing.remove();
+    const reply = chatReply(text);
+    pushChatMsg({ role: 'bot', text: reply.text, cards: reply.cards || [], at: Date.now() });
+    renderChatBody();
+    streamLastMsg();
+  }, 600 + Math.random() * 500);
+}
+
+/* ================= 登顶庆祝 ================= */
+function confetti() {
+  const root = $('#confetti-root');
+  if (!root) return;
+  const colors = ['#52b788', '#f5a623', '#d64545', '#4ea8de', '#ffd9a3'];
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('i');
+    p.style.left = (Math.random() * 100).toFixed(1) + '%';
+    p.style.background = colors[i % colors.length];
+    p.style.animationDelay = (Math.random() * 0.35).toFixed(2) + 's';
+    p.style.animationDuration = (1.5 + Math.random() * 1).toFixed(2) + 's';
+    root.appendChild(p);
+  }
+  setTimeout(() => { root.innerHTML = ''; }, 3000);
+}
 function toast(msg, gold = false) {
   const el = document.createElement('div');
   el.className = 'toast' + (gold ? ' gold' : '');
@@ -824,7 +1115,20 @@ function handleAction(t) {
   const { action } = t.dataset;
   switch (action) {
     case 'open-mountain':
+      closeChat();
       location.hash = `#/mountain/${t.dataset.id}`;
+      break;
+    case 'open-chat':
+      openChat();
+      break;
+    case 'close-chat':
+      closeChat();
+      break;
+    case 'chat-send':
+      sendChat($('#chat-input')?.value);
+      break;
+    case 'chat-quick':
+      sendChat(t.dataset.q || '');
       break;
     case 'back':
       history.length > 1 ? history.back() : (location.hash = '#/explore');
@@ -951,6 +1255,11 @@ document.addEventListener('click', (e) => {
 
 /* role=button 卡片的键盘操作（Enter / 空格） */
 document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && e.target.id === 'chat-input') {
+    e.preventDefault();
+    sendChat(e.target.value);
+    return;
+  }
   if (e.key !== 'Enter' && e.key !== ' ') return;
   const t = e.target.closest?.('[data-action][role="button"]');
   if (!t) return;
