@@ -14,6 +14,14 @@
 - 登顶生成**中式登顶证书**（姓名/山名/海拔/用时/红章），可下载 PNG 分享
 - 攀登履历集章 + 专属成就（云端登顶、8848 俱乐部）
 
+## 跑在 GitHub 上的推荐系统 📡
+
+架构借鉴 [Friend-Circle-Lite](https://github.com/cworld1/friend-circle-lite)（无后端、GitHub Actions 定时计算 → 静态 JSON → Pages 展示）：
+
+- [recommender/generate.py](recommender/generate.py)（纯标准库）每天由 [GitHub Actions](.github/workflows/recommend.yml) 定时运行：按**季节适配、标签热度、风景评分、周度轮换**多信号打分，生成"今日精选 / 当季最佳 / 编辑精选"写入 [api/recs.json](api/recs.json) 并自动提交
+- 前端首页实时拉取该 JSON 渲染推荐位（带推荐理由），拉取失败时自动回退到本地计算，离线也能用
+- 全程零服务器、零成本，机器人提交记录可在 git 历史中追溯（`recs: 每日推荐更新 …`）
+
 ## 其他功能
 
 - **首页**：登山数据总览、高分名山推荐、热门主题（#看日出 #夜爬 #云海…）、最近打卡动态
