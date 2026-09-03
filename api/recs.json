@@ -1,0 +1,169 @@
+{
+  "version": 1,
+  "generatedAt": "2026-09-03T18:49:02Z",
+  "forDate": "2026-09-04",
+  "week": 36,
+  "source": "github-actions",
+  "seasonal": [
+    {
+      "id": "wugongshan",
+      "name": "武功山",
+      "emoji": "⛺",
+      "province": "江西 · 萍乡",
+      "elevation": 1918,
+      "difficulty": 3,
+      "difficultyLabel": "进阶",
+      "scenery": 4.7,
+      "reason": "9 月正当时：星空最佳观赏期，风景评分 4.7",
+      "score": 23.26
+    },
+    {
+      "id": "huangshan",
+      "name": "黄山",
+      "emoji": "🌊",
+      "province": "安徽 · 黄山市",
+      "elevation": 1864,
+      "difficulty": 4,
+      "difficultyLabel": "困难",
+      "scenery": 5.0,
+      "reason": "9 月正当时：日出最佳观赏期，风景评分 5.0",
+      "score": 21.28
+    },
+    {
+      "id": "siguniangshan",
+      "name": "四姑娘山大峰",
+      "emoji": "🏔️",
+      "province": "四川 · 阿坝",
+      "elevation": 5025,
+      "difficulty": 5,
+      "difficultyLabel": "挑战",
+      "scenery": 4.9,
+      "reason": "9 月正当时：雪山最佳观赏期，风景评分 4.9",
+      "score": 19.14
+    },
+    {
+      "id": "taishan",
+      "name": "泰山",
+      "emoji": "🌄",
+      "province": "山东 · 泰安",
+      "elevation": 1545,
+      "difficulty": 3,
+      "difficultyLabel": "进阶",
+      "scenery": 4.9,
+      "reason": "9 月正当时：夜爬最佳观赏期，风景评分 4.9",
+      "score": 18.78
+    },
+    {
+      "id": "hengshan_s",
+      "name": "衡山",
+      "emoji": "🕯️",
+      "province": "湖南 · 衡阳",
+      "elevation": 1300,
+      "difficulty": 2,
+      "difficultyLabel": "轻松",
+      "scenery": 4.5,
+      "reason": "9 月正当时：日出最佳观赏期，风景评分 4.5",
+      "score": 18.06
+    }
+  ],
+  "trending": [
+    {
+      "id": "taishan",
+      "name": "泰山",
+      "emoji": "🌄",
+      "province": "山东 · 泰安",
+      "elevation": 1545,
+      "difficulty": 3,
+      "difficultyLabel": "进阶",
+      "scenery": 4.9,
+      "reason": "本周热度上升 52%，夜爬主题搜索量激增",
+      "score": 12.77
+    },
+    {
+      "id": "tianmenshan",
+      "name": "天门山",
+      "emoji": "🚡",
+      "province": "湖南 · 张家界",
+      "elevation": 1518,
+      "difficulty": 2,
+      "difficultyLabel": "轻松",
+      "scenery": 4.8,
+      "reason": "本周热度上升 45%，天门洞主题搜索量激增",
+      "score": 12.06
+    },
+    {
+      "id": "songshan",
+      "name": "嵩山",
+      "emoji": "🥋",
+      "province": "河南 · 登封",
+      "elevation": 1491,
+      "difficulty": 3,
+      "difficultyLabel": "进阶",
+      "scenery": 4.5,
+      "reason": "本周热度上升 51%，五岳主题搜索量激增",
+      "score": 11.86
+    },
+    {
+      "id": "hengshan_s",
+      "name": "衡山",
+      "emoji": "🕯️",
+      "province": "湖南 · 衡阳",
+      "elevation": 1300,
+      "difficulty": 2,
+      "difficultyLabel": "轻松",
+      "scenery": 4.5,
+      "reason": "本周热度上升 49%，日出主题搜索量激增",
+      "score": 11.74
+    },
+    {
+      "id": "wugongshan",
+      "name": "武功山",
+      "emoji": "⛺",
+      "province": "江西 · 萍乡",
+      "elevation": 1918,
+      "difficulty": 3,
+      "difficultyLabel": "进阶",
+      "scenery": 4.7,
+      "reason": "本周热度上升 42%，星空主题搜索量激增",
+      "score": 11.65
+    }
+  ],
+  "editors": [
+    {
+      "id": "emeishan",
+      "name": "峨眉山",
+      "emoji": "🐘",
+      "province": "四川 · 乐山",
+      "elevation": 3079,
+      "difficulty": 4,
+      "difficultyLabel": "困难",
+      "scenery": 4.8,
+      "reason": "峨眉山是普贤菩萨道场，从报国寺徒步至金顶约需两日，沿途古寺林立、林深雾绕",
+      "score": 14.4
+    },
+    {
+      "id": "tianmenshan",
+      "name": "天门山",
+      "emoji": "🚡",
+      "province": "湖南 · 张家界",
+      "elevation": 1518,
+      "difficulty": 2,
+      "difficultyLabel": "轻松",
+      "scenery": 4.8,
+      "reason": "天门山索道全长 7455 米，堪称世界最长高山客运索道之一",
+      "score": 14.4
+    },
+    {
+      "id": "wugongshan",
+      "name": "武功山",
+      "emoji": "⛺",
+      "province": "江西 · 萍乡",
+      "elevation": 1918,
+      "difficulty": 3,
+      "difficultyLabel": "进阶",
+      "scenery": 4.7,
+      "reason": "武功山以十万亩高山草甸闻名，春夏绿浪翻滚，秋季金黄一片",
+      "score": 14.1
+    }
+  ]
+}

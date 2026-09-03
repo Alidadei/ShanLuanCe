@@ -1,0 +1,35 @@
+name: daily-recommendations
+
+# 每天北京时间 11:20 跑一次推荐引擎，把结果提交成静态 JSON（api/recs.json）
+on:
+  schedule:
+    - cron: '20 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: recs
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 生成每日推荐
+        run: python3 recommender/generate.py
+
+      - name: 提交结果
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add api/recs.json
+          if git diff --cached --quiet; then
+            echo "推荐结果无变化，跳过提交"
+          else
+            git commit -m "recs: 每日推荐更新 $(date -u +%F)"
+            git push
+          fi
