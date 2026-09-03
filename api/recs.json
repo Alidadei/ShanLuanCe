@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-03T18:49:02Z",
-  "forDate": "2026-09-04",
+  "generatedAt": "2026-09-03T18:52:23Z",
+  "forDate": "2026-09-03",
   "week": 36,
   "source": "github-actions",
   "seasonal": [
@@ -15,7 +15,7 @@
       "difficultyLabel": "进阶",
       "scenery": 4.7,
       "reason": "9 月正当时：星空最佳观赏期，风景评分 4.7",
-      "score": 23.26
+      "score": 22.92
     },
     {
       "id": "huangshan",
@@ -27,19 +27,7 @@
       "difficultyLabel": "困难",
       "scenery": 5.0,
       "reason": "9 月正当时：日出最佳观赏期，风景评分 5.0",
-      "score": 21.28
-    },
-    {
-      "id": "siguniangshan",
-      "name": "四姑娘山大峰",
-      "emoji": "🏔️",
-      "province": "四川 · 阿坝",
-      "elevation": 5025,
-      "difficulty": 5,
-      "difficultyLabel": "挑战",
-      "scenery": 4.9,
-      "reason": "9 月正当时：雪山最佳观赏期，风景评分 4.9",
-      "score": 19.14
+      "score": 22.0
     },
     {
       "id": "taishan",
@@ -51,7 +39,19 @@
       "difficultyLabel": "进阶",
       "scenery": 4.9,
       "reason": "9 月正当时：夜爬最佳观赏期，风景评分 4.9",
-      "score": 18.78
+      "score": 19.11
+    },
+    {
+      "id": "siguniangshan",
+      "name": "四姑娘山大峰",
+      "emoji": "🏔️",
+      "province": "四川 · 阿坝",
+      "elevation": 5025,
+      "difficulty": 5,
+      "difficultyLabel": "挑战",
+      "scenery": 4.9,
+      "reason": "9 月正当时：雪山最佳观赏期，风景评分 4.9",
+      "score": 18.9
     },
     {
       "id": "hengshan_s",
@@ -63,7 +63,7 @@
       "difficultyLabel": "轻松",
       "scenery": 4.5,
       "reason": "9 月正当时：日出最佳观赏期，风景评分 4.5",
-      "score": 18.06
+      "score": 18.34
     }
   ],
   "trending": [
