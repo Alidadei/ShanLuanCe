@@ -346,6 +346,21 @@ ul { list-style: none; }
 
 .scene { display: block; width: 100%; height: auto; }
 
+/* 实景照片层（覆盖 SVG 山景，onerror 自动移除兜底） */
+.art .photo,
+.detail-hero .scene-wrap .photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(.94);
+}
+.detail-hero .scene-wrap .photo {
+  animation: photoIn .5s ease both;
+}
+@keyframes photoIn { from { opacity: 0; } }
+
 /* 山峰卡片 */
 .m-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 

@@ -237,6 +237,10 @@ const unlockedIds = () => ACHIEVEMENTS.filter((a) => a.test(computeStats())).map
 let uidCounter = 0;
 const uid = () => ++uidCounter;
 
+/* 实景照片：加载失败自动移除，露出下层 SVG 山景兜底 */
+const photoTag = (m) =>
+  `<img class="photo" src="img/${m.id}.jpg" alt="${esc(m.name)}实景" loading="lazy" onerror="this.remove()">`;
+
 function mountainScene(m) {
   const [skyTop, skyBottom, back, front] = m.colors;
   const r = rng(m.id + 'scene');
@@ -317,7 +321,7 @@ function mountainCard(m) {
   const d = distToMountain(m);
   return `
   <div class="m-card" role="button" tabindex="0" aria-label="${esc(m.name)}" data-action="open-mountain" data-id="${m.id}">
-    <div class="art">${mountainScene(m)}${d !== null ? `<span class="dist-tag">📍 ${fmtDist(d)}</span>` : ''}<span class="elev-tag">${fmtNum(m.elevation)}m</span></div>
+    <div class="art">${mountainScene(m)}${photoTag(m)}${d !== null ? `<span class="dist-tag">📍 ${fmtDist(d)}</span>` : ''}<span class="elev-tag">${fmtNum(m.elevation)}m</span></div>
     <div class="body">
       <div class="name"><span>${m.emoji}</span>${esc(m.name)}</div>
       <div class="loc">${esc(m.province)}</div>
@@ -333,7 +337,7 @@ function mountainMini(m, sub, climbed) {
   const d = distToMountain(m);
   return `
   <div class="m-mini" role="button" tabindex="0" aria-label="${esc(m.name)}" data-action="open-mountain" data-id="${m.id}">
-    <div class="art">${mountainScene(m)}${d !== null ? `<span class="dist-tag">📍 ${fmtDist(d)}</span>` : ''}</div>
+    <div class="art">${mountainScene(m)}${photoTag(m)}${d !== null ? `<span class="dist-tag">📍 ${fmtDist(d)}</span>` : ''}</div>
     <div class="body">
       <div class="name">${m.emoji} ${esc(m.name)}${climbed ? ' <span class="mini-done">✅</span>' : ''}</div>
       <div class="sub" title="${esc(sub || '')}">${esc(sub || `${m.province} · ${fmtNum(m.elevation)}m`)}</div>
@@ -567,7 +571,7 @@ function viewMountain(m) {
   const d = distToMountain(m);
   return `
   <div class="detail-hero">
-    <div class="scene-wrap">${mountainScene(m)}</div>
+    <div class="scene-wrap">${mountainScene(m)}${photoTag(m)}</div>
     <div class="overlay">
       <button class="back-btn" data-action="back" aria-label="返回">
         <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>

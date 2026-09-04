@@ -41,6 +41,10 @@
 - 手机开启 GPS 后精度可达数十米；桌面浏览器依赖 Wi-Fi/IP 定位，误差可能较大属正常现象
 - 定位功能需要 HTTPS 或 localhost 环境（GitHub Pages 部署地址满足要求）
 
+## 图片说明
+
+15 座名山的卡片与详情页使用**真实实景照片**，来自 Wikimedia Commons（自由许可），由 [scripts/fetch_photos.py](scripts/fetch_photos.py) 自动检索下载（800px 压缩图，自托管于 `img/`），作者与许可协议逐张记录在 [img/CREDITS.md](img/CREDITS.md)。照片加载失败时自动回退到程序化生成的 SVG 山景插画。
+
 ## 运行
 
 方式一（最简单）：直接双击打开 `index.html`。
