@@ -18,7 +18,7 @@
 
 架构借鉴 [Friend-Circle-Lite](https://github.com/cworld1/friend-circle-lite)（无后端、GitHub Actions 定时计算 → 静态 JSON → Pages 展示）：
 
-- [recommender/generate.py](recommender/generate.py)（纯标准库）每天由 [GitHub Actions](.github/workflows/recommend.yml) 定时运行：按**季节适配、标签热度、风景评分、周度轮换**多信号打分，生成"今日精选 / 当季最佳 / 编辑精选"写入 [api/recs.json](api/recs.json) 并自动提交
+- [recommender/generate.py](recommender/generate.py)（纯标准库）每天由 [GitHub Actions](.github/workflows/recommend.yml) 定时运行，多信号加权打分：**真实天气预报**（Open-Meteo，看天推荐）、季节适配、周末/两天线场景、节假日人流预警与错峰推荐、周度热度轮换，生成"今日精选 / 当季最佳 / 周末就出发 / 编辑精选"写入 [api/recs.json](api/recs.json) 并自动提交
 - 前端首页实时拉取该 JSON 渲染推荐位（带推荐理由），拉取失败时自动回退到本地计算，离线也能用
 - 全程零服务器、零成本，机器人提交记录可在 git 历史中追溯（`recs: 每日推荐更新 …`）
 
