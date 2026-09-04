@@ -121,7 +121,13 @@ async function maybeAutoLocate() {
 }
 
 /* ================= 存储 ================= */
-const STORE_KEY = 'pashanqu.v1';
+const STORE_KEY = 'xunshance.v1';
+const LEGACY_KEY = 'pashanqu.v1'; // 更名前的旧存储键
+
+/* 老用户数据自动迁移到新键（保留旧键以防回滚） */
+if (!localStorage.getItem(STORE_KEY) && localStorage.getItem(LEGACY_KEY)) {
+  try { localStorage.setItem(STORE_KEY, localStorage.getItem(LEGACY_KEY)); } catch { /* 忽略 */ }
+}
 
 const okAvatar = (v) =>
   typeof v === 'string' && (v.startsWith('data:image/') ? v.length < 400000 : v.length > 0 && v.length <= 4);
@@ -430,7 +436,7 @@ function viewHome() {
       ${mountainScene({ id: 'hero', colors: ['#1b4332', '#52b788', '#2d6a4f', '#123527'] })}
       <div class="hero-content">
         <div class="hello">你好，${esc(state.nickname)} ${dayEmoji}</div>
-        <h1>爬山趣</h1>
+        <h1>巡山册</h1>
         <div class="slogan">会当凌绝顶，一览众山小</div>
         <div class="hero-stats">
           <div class="hstat"><b>${s.count}</b><span>打卡次数</span></div>
@@ -565,8 +571,8 @@ function viewExplore() {
 
 /* ================= 相册与外链 ================= */
 function albumList(m) {
-  const list = (typeof PHOTO_ALBUMS !== 'undefined' && PHOTO_ALBUMS[m.id]) || [`img/${m.id}.jpg`];
-  return list;
+  if (typeof PHOTO_ALBUMS !== 'undefined' && Array.isArray(PHOTO_ALBUMS[m.id])) return PHOTO_ALBUMS[m.id];
+  return []; // 尚未收录照片的山（如新增山峰），隐藏相册区
 }
 
 let albumState = null;
@@ -664,6 +670,7 @@ function viewMountain(m) {
     <p class="kv" style="margin-top:10px"><b>最佳季节</b>${esc(m.bestSeason)}　<b>风景评分</b><span class="stars">${starRow(5)}</span> ${m.scenery.toFixed(1)}</p>
   </div>
 
+  ${albumList(m).length ? `
   <div class="d-section">
     <h3><span class="ico">📸</span>实景相册 <small style="font-weight:400;color:var(--ink-3)">${albumList(m).length} 张 · 点击查看大图</small></h3>
     <div class="album-strip">
@@ -672,7 +679,7 @@ function viewMountain(m) {
         <img src="${src}" alt="${esc(m.name)}实景${i + 1}" loading="lazy">
       </button>`).join('')}
     </div>
-  </div>
+  </div>` : ''}
 
   <div class="d-section">
     <h3><span class="ico">💬</span>驴友视角 <small style="font-weight:400;color:var(--ink-3)">去测评平台看真实口碑</small></h3>
@@ -791,7 +798,7 @@ function viewProfile() {
     <button class="btn btn-ghost" data-action="import-gpx">📥 导入 GPX 轨迹</button>
     <button class="btn btn-danger-ghost" data-action="clear">🗑️ 清空记录</button>
   </div>
-  <div style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:22px">爬山趣 v2.0 · 步步登峰 · 数据仅保存在本机</div>
+  <div style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:22px">巡山册 v3.0 · 步步登峰 · 数据仅保存在本机</div>
   `;
 }
 
@@ -1951,10 +1958,10 @@ function handleAction(t) {
       }
       break;
     case 'export': {
-      const blob = new Blob([JSON.stringify({ app: '爬山趣', exportedAt: new Date().toISOString(), ...state }, null, 2)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify({ app: '巡山册', exportedAt: new Date().toISOString(), ...state }, null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `爬山趣备份-${todayStr()}.json`;
+      a.download = `巡山册备份-${todayStr()}.json`;
       a.click();
       URL.revokeObjectURL(a.href);
       toast('备份已导出 ⬇️');
