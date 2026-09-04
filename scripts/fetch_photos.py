@@ -108,18 +108,25 @@ def main(force=False):
     credits = {}
     if credits_path.exists():
         for line in credits_path.read_text(encoding="utf-8").splitlines():
-            m = re.match(r"- \*\*(.+?)\*\*（`([\w-]+)\.jpg`）：\[(.+?)\]\((.+?)\)，作者：(.+)，许可：(.+)$", line)
+            m = re.match(r"- \*\*(.+?)\*\*（`([\w-]+\.jpg)`）：\[(.+?)\]\((.+?)\)，作者：(.+)，许可：(.+)$", line)
             if m:
                 credits[m.group(2)] = m.groups()
 
+    EXTRA = 3  # 每山补充照片数（相册）
     ok, fail = 0, []
     for mid, (pattern, queries) in M.items():
-        out = IMG / f"{mid}.jpg"
-        if out.exists() and out.stat().st_size > 20000 and not force and mid in credits:
+        main_out = IMG / f"{mid}.jpg"
+        need_main = force or not (main_out.exists() and main_out.stat().st_size > 20000)
+        missing_extra = [i for i in range(2, 2 + EXTRA)
+                         if force or not (IMG / f"{mid}-{i}.jpg").exists()]
+        if not need_main and not missing_extra and mid in credits:
             ok += 1
-            print(f"[{mid}] 已有，跳过")
+            print(f"[{mid}] 已齐全，跳过")
             continue
-        chosen = None
+
+        # 汇总所有查询词的候选（标题过滤 + 去重）
+        seen_titles = set()
+        pool = []
         for q in queries:
             print(f"[{mid}] 搜索：{q}")
             try:
@@ -127,36 +134,69 @@ def main(force=False):
             except Exception as e:
                 print(f"    检索失败：{e}")
                 continue
-            if cands:
-                chosen = cands[0]
+            for c in cands:
+                if c["title"] not in seen_titles:
+                    seen_titles.add(c["title"])
+                    pool.append(c)
+
+        # 主图
+        if need_main:
+            if not pool:
+                fail.append(mid)
+                print("    ✗ 无合格候选")
+                continue
+            c = pool[0]
+            try:
+                img = get_with_fallback(c["thumb"])
+                if not img.startswith(b"\xff\xd8"):
+                    raise ValueError("非 JPEG")
+            except Exception as e:
+                print(f"    下载失败：{e}")
+                fail.append(mid)
+                continue
+            main_out.write_bytes(img)
+            credits[mid] = (cn_names.get(mid, mid), f"{mid}.jpg", c["title"],
+                            f"https://commons.wikimedia.org/wiki/{urllib.parse.quote(c['title'])}",
+                            c["artist"], c["license"])
+            print(f"    ✓ 主图 {c['title']}（{len(img)//1024}KB）")
+        elif mid not in credits:
+            credits[mid] = (cn_names.get(mid, mid), f"{mid}.jpg", "（历史下载）",
+                            "", "未知作者", "见 Commons")
+
+        # 补充相册图（跳过主图已用标题）
+        used = {credits[mid][2] for mid2 in [mid] if mid in credits} if mid in credits else set()
+        idx = 2
+        for c in pool[1 if not need_main else 1:]:
+            if idx > 1 + EXTRA:
                 break
-        if not chosen:
-            fail.append(mid)
-            print("    ✗ 无合格候选")
-            continue
-        try:
-            img = get_with_fallback(chosen["thumb"])
-            if not img.startswith(b"\xff\xd8"):
-                raise ValueError("非 JPEG")
-        except Exception as e:
-            print(f"    下载失败：{e}")
-            fail.append(mid)
-            continue
-        out.write_bytes(img)
+            if c["title"] in used:
+                continue
+            out = IMG / f"{mid}-{idx}.jpg"
+            try:
+                img = get_with_fallback(c["thumb"])
+                if not img.startswith(b"\xff\xd8"):
+                    raise ValueError("非 JPEG")
+            except Exception as e:
+                print(f"    补充图下载失败：{e}")
+                continue
+            out.write_bytes(img)
+            used.add(c["title"])
+            credits[f"{mid}-{idx}"] = (f"{cn_names.get(mid, mid)}·相册{idx - 1}", f"{mid}-{idx}.jpg", c["title"],
+                                       f"https://commons.wikimedia.org/wiki/{urllib.parse.quote(c['title'])}",
+                                       c["artist"], c["license"])
+            print(f"    ✓ 相册{idx - 1} {c['title']}（{len(img)//1024}KB）")
+            idx += 1
         ok += 1
-        credits[mid] = (cn_names.get(mid, mid), mid, chosen["title"],
-                        f"https://commons.wikimedia.org/wiki/{urllib.parse.quote(chosen['title'])}",
-                        chosen["artist"], chosen["license"])
-        print(f"    ✓ {chosen['title']}（{len(img)//1024}KB，{chosen['license']}，by {chosen['artist'][:28]}）")
 
     lines = ["# 图片版权信息", "",
              "以下照片来自 Wikimedia Commons（自由许可），按山名列出作者与协议：", ""]
-    for mid in M:
+    for mid in list(M.keys()) + [f"{m}-{i}" for m in M for i in range(2, 2 + EXTRA)]:
         if mid in credits:
-            cn, _mid, title, page, artist, lic = credits[mid]
-            lines.append(f"- **{cn}**（`{mid}.jpg`）：[{title}]({page})，作者：{artist}，许可：{lic}")
+            cn, fname, title, page, artist, lic = credits[mid]
+            if page:
+                lines.append(f"- **{cn}**（`{fname}`）：[{title}]({page})，作者：{artist}，许可：{lic}")
     credits_path.write_text("\n".join(lines), encoding="utf-8")
-    print(f"\n[done] 成功 {ok}/15，失败：{fail or '无'}")
+    print(f"\n[done] 处理完成 {ok}/15，失败：{fail or '无'}")
 
 
 if __name__ == "__main__":

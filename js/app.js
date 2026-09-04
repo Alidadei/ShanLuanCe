@@ -563,6 +563,57 @@ function viewExplore() {
   `;
 }
 
+/* ================= 相册与外链 ================= */
+function albumList(m) {
+  const list = (typeof PHOTO_ALBUMS !== 'undefined' && PHOTO_ALBUMS[m.id]) || [`img/${m.id}.jpg`];
+  return list;
+}
+
+let albumState = null;
+
+function renderAlbumFrame() {
+  const { list, idx } = albumState;
+  const img = $('#lb-img');
+  const cnt = $('#lb-count');
+  if (img) {
+    img.src = list[idx];
+    img.alt = `实景 ${idx + 1}`;
+  }
+  if (cnt) cnt.textContent = `${idx + 1} / ${list.length}`;
+}
+
+function openAlbum(m, idx = 0) {
+  const list = albumList(m);
+  if (!list.length) return;
+  albumState = { m, list, idx };
+  $('#modal-root').innerHTML = `
+  <div class="lightbox" data-action="close-modal-bg" role="dialog" aria-label="实景相册">
+    <button class="lb-close" data-action="close-modal" aria-label="关闭相册">✕</button>
+    <button class="lb-nav prev" data-action="album-prev" aria-label="上一张">‹</button>
+    <div class="lb-stage" data-stop="1">
+      <img id="lb-img" src="${list[idx]}" alt="实景照片">
+      <div class="lb-bar"><b>${esc(m.name)} · 实景</b><span id="lb-count"></span></div>
+    </div>
+    <button class="lb-nav next" data-action="album-next" aria-label="下一张">›</button>
+  </div>`;
+  renderAlbumFrame();
+}
+
+function albumStep(d) {
+  if (!albumState) return;
+  const n = albumState.list.length;
+  albumState.idx = (albumState.idx + d + n) % n;
+  renderAlbumFrame();
+}
+
+const REVIEWS_LINKS = [
+  { name: '大众点评', emoji: '🥇', url: (n) => `https://www.dianping.com/search/keyword/1/0_${encodeURIComponent(n)}` },
+  { name: '马蜂窝攻略', emoji: '🧭', url: (n) => `https://www.mafengwo.cn/search/q.php?q=${encodeURIComponent(n)}` },
+  { name: '六只脚轨迹', emoji: '🥾', url: (n) => `https://www.foooooot.com/search/trip/?keyword=${encodeURIComponent(n)}` },
+  { name: '两步路线路', emoji: '🗺️', url: (n) => `https://www.2bulu.com/road/search.htm?keyword=${encodeURIComponent(n)}` },
+  { name: '百度百科', emoji: '📖', url: (n) => `https://baike.baidu.com/item/${encodeURIComponent(n)}` },
+];
+
 /* ================= 视图：详情 ================= */
 function viewMountain(m) {
   const s = computeStats();
@@ -611,6 +662,28 @@ function viewMountain(m) {
     <h3><span class="ico">📝</span>山峰介绍</h3>
     <p>${esc(m.description)}</p>
     <p class="kv" style="margin-top:10px"><b>最佳季节</b>${esc(m.bestSeason)}　<b>风景评分</b><span class="stars">${starRow(5)}</span> ${m.scenery.toFixed(1)}</p>
+  </div>
+
+  <div class="d-section">
+    <h3><span class="ico">📸</span>实景相册 <small style="font-weight:400;color:var(--ink-3)">${albumList(m).length} 张 · 点击查看大图</small></h3>
+    <div class="album-strip">
+      ${albumList(m).map((src, i) => `
+      <button type="button" class="album-thumb ${i === 0 ? 'on' : ''}" data-action="open-album" data-idx="${i}">
+        <img src="${src}" alt="${esc(m.name)}实景${i + 1}" loading="lazy">
+      </button>`).join('')}
+    </div>
+  </div>
+
+  <div class="d-section">
+    <h3><span class="ico">💬</span>驴友视角 <small style="font-weight:400;color:var(--ink-3)">去测评平台看真实口碑</small></h3>
+    <div class="review-links">
+      ${REVIEWS_LINKS.map((l) => `
+      <a class="review-link" href="${l.url(m.name)}" target="_blank" rel="noopener noreferrer">
+        <span class="rl-emoji" aria-hidden="true">${l.emoji}</span>
+        <span class="rl-txt"><b>${l.name}</b><small>真实评价与攻略</small></span>
+        <span class="rl-go" aria-hidden="true">↗</span>
+      </a>`).join('')}
+    </div>
   </div>
 
   <div class="d-section">
@@ -1813,7 +1886,22 @@ function handleAction(t) {
     case 'checkin':
       openCheckinModal(t.dataset.id || null);
       break;
+    case 'open-album': {
+      const mm = mountainById(location.hash.match(/^#\/mountain\/([\w-]+)$/)?.[1] || '');
+      if (mm) openAlbum(mm, parseInt(t.dataset.idx, 10) || 0);
+      break;
+    }
+    case 'album-prev':
+      albumStep(-1);
+      break;
+    case 'album-next':
+      albumStep(1);
+      break;
     case 'close-modal':
+    case 'close-modal-bg':
+      albumState = null;
+      closeModal();
+      break;
       closeModal();
       break;
     case 'save-record':
@@ -1915,6 +2003,11 @@ document.addEventListener('click', (e) => {
 
 /* role=button 卡片的键盘操作（Enter / 空格） */
 document.addEventListener('keydown', (e) => {
+  if (albumState) {
+    if (e.key === 'Escape') { albumState = null; closeModal(); return; }
+    if (e.key === 'ArrowLeft') { albumStep(-1); return; }
+    if (e.key === 'ArrowRight') { albumStep(1); return; }
+  }
   if (e.key === 'Enter' && e.target.id === 'chat-input') {
     e.preventDefault();
     sendChat(e.target.value);

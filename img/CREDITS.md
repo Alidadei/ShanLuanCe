@@ -2,18 +2,47 @@
 
 以下照片来自 Wikimedia Commons（自由许可），按山名列出作者与协议：
 
-- **泰山**（`taishan.jpg`）：[File:Jade Emperor Peak of Mount Tai 泰山玉皇顶 2007 075.jpg](https://commons.wikimedia.org/wiki/File%3AJade%20Emperor%20Peak%20of%20Mount%20Tai%20%E6%B3%B0%E5%B1%B1%E7%8E%89%E7%9A%87%E9%A1%B6%202007%20075.jpg)，作者：╬ಠ益ಠ)，许可：CC0
-- **华山**（`huashan.jpg`）：[File:Huashan Mountain (140790979).jpeg](https://commons.wikimedia.org/w/index.php?curid=73811937)，作者：Neo，许可：CC BY 3.0
-- **黄山**（`huangshan.jpg`）：[File:Huangshan Mountain - panoramio.jpg](https://commons.wikimedia.org/w/index.php?curid=53261463)，作者：Xiaotong Gao，许可：CC BY-SA 3.0
-- **峨眉山**（`emeishan.jpg`）：[File:峨眉山风景区 Mount Emei Scenic Area 07.jpg](https://commons.wikimedia.org/wiki/File%3A%E5%B3%A8%E7%9C%89%E5%B1%B1%E9%A3%8E%E6%99%AF%E5%8C%BA%20Mount%20Emei%20Scenic%20Area%2007.jpg)，作者：George N，许可：CC BY 2.0
-- **武功山**（`wugongshan.jpg`）：[File:Wugongshan jisi yizhi 8426.jpg](https://commons.wikimedia.org/wiki/File%3AWugongshan%20jisi%20yizhi%208426.jpg)，作者：Doctoroftcm，许可：CC BY-SA 3.0
-- **香山**（`xiangshan.jpg`）：[File:Palace of Fragrant Hills 20251121.jpg](https://commons.wikimedia.org/wiki/File%3APalace%20of%20Fragrant%20Hills%2020251121.jpg)，作者：颐园居，许可：CC BY-SA 4.0
-- **岳麓山**（`yuelushan.jpg`）：[File:Changsha Yuelu Shan Sheli Ta 2014.03.04 11-27-41.jpg](https://commons.wikimedia.org/wiki/File%3AChangsha%20Yuelu%20Shan%20Sheli%20Ta%202014.03.04%2011-27-41.jpg)，作者：Zhangzhugang，许可：CC BY-SA 4.0
-- **白云山**（`baiyunshan.jpg`）：[File:白云山开广州市.jpg](https://commons.wikimedia.org/wiki/File%3A%E7%99%BD%E4%BA%91%E5%B1%B1%E5%BC%80%E5%B9%BF%E5%B7%9E%E5%B8%82.jpg)，作者：EditQ，许可：CC BY-SA 4.0
-- **青城山**（`qingchengshan.jpg`）：[File:青城山 Mount Qingcheng 2017.jpg](https://commons.wikimedia.org/wiki/File%3A%E9%9D%92%E5%9F%8E%E5%B1%B1%20Mount%20Qingcheng%202017.jpg)，作者：JianEn Yu，许可：CC BY 2.0
-- **庐山**（`lushan.jpg`）：[File:Mount Lu.jpg](https://commons.wikimedia.org/w/index.php?curid=87774967)，作者：Pauloleong2002，许可：CC BY-SA 4.0
-- **天门山**（`tianmenshan.jpg`）：[File:Tianmen 38330-Zhangjiajie (49047525877).jpg](https://commons.wikimedia.org/wiki/File%3ATianmen%2038330-Zhangjiajie%20%2849047525877%29.jpg)，作者：xiquinhosilva，许可：CC BY 2.0
-- **四姑娘山大峰**（`siguniangshan.jpg`）：[File:Mount Siguniang 2.jpg](https://commons.wikimedia.org/wiki/File%3AMount%20Siguniang%202.jpg)，作者：Johannes Böckh，许可：CC BY-SA 3.0
-- **恒山**（`hengshan_n.jpg`）：[File:Heng Shan (Shanxi) viewpoint 100 m below the summit.jpg](https://commons.wikimedia.org/wiki/File%3AHeng%20Shan%20%28Shanxi%29%20viewpoint%20100%20m%20below%20the%20summit.jpg)，作者：Woudloper，许可：CC BY-SA 4.0
-- **衡山**（`hengshan_s.jpg`）：[File:Zhurong Hall, Mount Heng (Hunan), picture3.jpg](https://commons.wikimedia.org/wiki/File%3AZhurong%20Hall%2C%20Mount%20Heng%20%28Hunan%29%2C%20picture3.jpg)，作者：Huangdan2060，许可：CC0
-- **嵩山**（`songshan.jpg`）：[File:Hikers in Taishi Shan Jingqu on Song Shan.jpg](https://commons.wikimedia.org/w/index.php?curid=163156837)，作者：Woudloper，许可：CC BY-SA 4.0
+- **泰山·相册1**（`taishan-2.jpg`）：[File:50549-Mount Tai-Taishan 泰山.jpg](https://commons.wikimedia.org/wiki/File%3A50549-Mount%20Tai-Taishan%20%E6%B3%B0%E5%B1%B1.jpg)，作者：xiquinhosilva，许可：CC BY 2.0
+- **泰山·相册2**（`taishan-3.jpg`）：[File:Air Force Hotel, Mount Tai 空军宾馆 泰山 2007 047.jpg](https://commons.wikimedia.org/wiki/File%3AAir%20Force%20Hotel%2C%20Mount%20Tai%20%E7%A9%BA%E5%86%9B%E5%AE%BE%E9%A6%86%20%E6%B3%B0%E5%B1%B1%202007%20047.jpg)，作者：╬ಠ益ಠ)，许可：CC0
+- **泰山·相册3**（`taishan-4.jpg`）：[File:50362 Mount Tai UNESCO mark.jpg](https://commons.wikimedia.org/wiki/File%3A50362%20Mount%20Tai%20UNESCO%20mark.jpg)，作者：xiquinhosilva，许可：CC BY 2.0
+- **华山·相册1**（`huashan-2.jpg`）：[File:The Chess Pavilion, Huashan, China.jpg](https://commons.wikimedia.org/wiki/File%3AThe%20Chess%20Pavilion%2C%20Huashan%2C%20China.jpg)，作者：May Wung，许可：CC BY-SA 4.0
+- **华山·相册2**（`huashan-3.jpg`）：[File:Chinese Chess Pavilion In Mount Hua.jpg](https://commons.wikimedia.org/wiki/File%3AChinese%20Chess%20Pavilion%20In%20Mount%20Hua.jpg)，作者：Liuboyoupeter，许可：CC BY-SA 4.0
+- **华山·相册3**（`huashan-4.jpg`）：[File:Mount Hua - panoramio.jpg](https://commons.wikimedia.org/wiki/File%3AMount%20Hua%20-%20panoramio.jpg)，作者：Raffaele Nicolussi，许可：CC BY 3.0
+- **黄山·相册1**（`huangshan-2.jpg`）：[File:Mount-huangshan 53319729912.jpg](https://commons.wikimedia.org/wiki/File%3AMount-huangshan%2053319729912.jpg)，作者：xiquinhosilva，许可：CC BY 2.0
+- **黄山·相册2**（`huangshan-3.jpg`）：[File:Mount-huangshan 53320837763 o.jpg](https://commons.wikimedia.org/wiki/File%3AMount-huangshan%2053320837763%20o.jpg)，作者：xiquinhosilva，许可：CC BY 2.0
+- **黄山·相册3**（`huangshan-4.jpg`）：[File:Mount-huangshan 53319731542 o.jpg](https://commons.wikimedia.org/wiki/File%3AMount-huangshan%2053319731542%20o.jpg)，作者：xiquinhosilva，许可：CC BY 2.0
+- **峨眉山·相册1**（`emeishan-2.jpg`）：[File:Mount emei tour.jpg](https://commons.wikimedia.org/wiki/File%3AMount%20emei%20tour.jpg)，作者：Ihtc2015，许可：CC BY-SA 4.0
+- **峨眉山·相册2**（`emeishan-3.jpg`）：[File:在峨秀湖远望峨眉山 Mount Emei 1.jpg](https://commons.wikimedia.org/wiki/File%3A%E5%9C%A8%E5%B3%A8%E7%A7%80%E6%B9%96%E8%BF%9C%E6%9C%9B%E5%B3%A8%E7%9C%89%E5%B1%B1%20Mount%20Emei%201.jpg)，作者：书剑飘零，许可：CC BY-SA 4.0
+- **峨眉山·相册3**（`emeishan-4.jpg`）：[File:在峨秀湖远望峨眉山 Mount Emei 2.jpg](https://commons.wikimedia.org/wiki/File%3A%E5%9C%A8%E5%B3%A8%E7%A7%80%E6%B9%96%E8%BF%9C%E6%9C%9B%E5%B3%A8%E7%9C%89%E5%B1%B1%20Mount%20Emei%202.jpg)，作者：书剑飘零，许可：CC BY-SA 4.0
+- **武功山·相册1**（`wugongshan-2.jpg`）：[File:Wugongshan jisi yizhi 8426.jpg](https://commons.wikimedia.org/wiki/File%3AWugongshan%20jisi%20yizhi%208426.jpg)，作者：Doctoroftcm，许可：CC BY-SA 3.0
+- **武功山·相册2**（`wugongshan-3.jpg`）：[File:Wugongshan jisi yizhi 8422.jpg](https://commons.wikimedia.org/wiki/File%3AWugongshan%20jisi%20yizhi%208422.jpg)，作者：Doctoroftcm，许可：CC BY-SA 3.0
+- **武功山·相册3**（`wugongshan-4.jpg`）：[File:Wugongshan jisi yizhi 8393.jpg](https://commons.wikimedia.org/wiki/File%3AWugongshan%20jisi%20yizhi%208393.jpg)，作者：Doctoroftcm，许可：CC BY-SA 3.0
+- **香山·相册1**（`xiangshan-2.jpg`）：[File:Xiangshan (Fragrant Hills) Park (43745555980).jpg](https://commons.wikimedia.org/wiki/File%3AXiangshan%20%28Fragrant%20Hills%29%20Park%20%2843745555980%29.jpg)，作者：Ludger Heide，许可：CC BY-SA 2.0
+- **香山·相册2**（`xiangshan-3.jpg`）：[File:香山 Fragrant Hills Ароматная гора (9451295212).jpg](https://commons.wikimedia.org/wiki/File%3A%E9%A6%99%E5%B1%B1%20Fragrant%20Hills%20%D0%90%D1%80%D0%BE%D0%BC%D0%B0%D1%82%D0%BD%D0%B0%D1%8F%20%D0%B3%D0%BE%D1%80%D0%B0%20%289451295212%29.jpg)，作者：Nikolaj Potanin from Russia，许可：CC BY-SA 2.0
+- **香山·相册3**（`xiangshan-4.jpg`）：[File:Fragrant Hills-pagoda1.JPG](https://commons.wikimedia.org/wiki/File%3AFragrant%20Hills-pagoda1.JPG)，作者：未知作者，许可：CC BY-SA 1.0
+- **岳麓山·相册1**（`yuelushan-2.jpg`）：[File:Yuelu Mountain 1.jpg](https://commons.wikimedia.org/wiki/File%3AYuelu%20Mountain%201.jpg)，作者：EditQ，许可：CC BY-SA 4.0
+- **岳麓山·相册2**（`yuelushan-3.jpg`）：[File:Qingfeng Spring on Yuelu Mountain 20230904.jpg](https://commons.wikimedia.org/wiki/File%3AQingfeng%20Spring%20on%20Yuelu%20Mountain%2020230904.jpg)，作者：Huangdan2060，许可：CC BY 4.0
+- **岳麓山·相册3**（`yuelushan-4.jpg`）：[File:Yuelu Mountain 6.jpg](https://commons.wikimedia.org/wiki/File%3AYuelu%20Mountain%206.jpg)，作者：EditQ，许可：CC BY-SA 4.0
+- **白云山·相册1**（`baiyunshan-2.jpg`）：[File:广州白云山的杜鹃花.jpg](https://commons.wikimedia.org/wiki/File%3A%E5%B9%BF%E5%B7%9E%E7%99%BD%E4%BA%91%E5%B1%B1%E7%9A%84%E6%9D%9C%E9%B9%83%E8%8A%B1.jpg)，作者：EditQ，许可：CC BY-SA 4.0
+- **白云山·相册2**（`baiyunshan-3.jpg`）：[File:Guangzhou Baiyun Mountain 20230515.150422.jpg](https://commons.wikimedia.org/wiki/File%3AGuangzhou%20Baiyun%20Mountain%2020230515.150422.jpg)，作者：古海岸遗址，许可：CC BY-SA 4.0
+- **白云山·相册3**（`baiyunshan-4.jpg`）：[File:Guangzhou Baiyun Mountain 20230515.150627.jpg](https://commons.wikimedia.org/wiki/File%3AGuangzhou%20Baiyun%20Mountain%2020230515.150627.jpg)，作者：古海岸遗址，许可：CC BY-SA 4.0
+- **青城山·相册1**（`qingchengshan-2.jpg`）：[File:Mount Qingcheng Kina 2009 0224 (4141063061).jpg](https://commons.wikimedia.org/wiki/File%3AMount%20Qingcheng%20Kina%202009%200224%20%284141063061%29.jpg)，作者：Einar Fredriksen，许可：CC BY-SA 2.0
+- **青城山·相册2**（`qingchengshan-3.jpg`）：[File:Mount Qingcheng Kina 2009 0257 (4141071043).jpg](https://commons.wikimedia.org/wiki/File%3AMount%20Qingcheng%20Kina%202009%200257%20%284141071043%29.jpg)，作者：Einar Fredriksen，许可：CC BY-SA 2.0
+- **青城山·相册3**（`qingchengshan-4.jpg`）：[File:Mount Qingcheng Kina 2009 0168 (4141044073).jpg](https://commons.wikimedia.org/wiki/File%3AMount%20Qingcheng%20Kina%202009%200168%20%284141044073%29.jpg)，作者：Einar Fredriksen，许可：CC BY-SA 2.0
+- **庐山·相册1**（`lushan-2.jpg`）：[File:庐山日出.JPG](https://commons.wikimedia.org/wiki/File%3A%E5%BA%90%E5%B1%B1%E6%97%A5%E5%87%BA.JPG)，作者：No machine-readable author provided. Chenyun~commonswiki assumed (based on copyright claims).，许可：CC BY-SA 2.5
+- **庐山·相册2**（`lushan-3.jpg`）：[File:Mount Lu 16147-Lushan (49052568127).jpg](https://commons.wikimedia.org/wiki/File%3AMount%20Lu%2016147-Lushan%20%2849052568127%29.jpg)，作者：xiquinhosilva，许可：CC BY 2.0
+- **庐山·相册3**（`lushan-4.jpg`）：[File:Mount Lu 16158-Lushan (49052568687).jpg](https://commons.wikimedia.org/wiki/File%3AMount%20Lu%2016158-Lushan%20%2849052568687%29.jpg)，作者：xiquinhosilva，许可：CC BY 2.0
+- **四姑娘山大峰·相册1**（`siguniangshan-2.jpg`）：[File:在成都遥望雪山 Chengdu skyline with a view of Mount Siguniang.jpg](https://commons.wikimedia.org/wiki/File%3A%E5%9C%A8%E6%88%90%E9%83%BD%E9%81%A5%E6%9C%9B%E9%9B%AA%E5%B1%B1%20Chengdu%20skyline%20with%20a%20view%20of%20Mount%20Siguniang.jpg)，作者：书剑飘零，许可：CC BY-SA 4.0
+- **四姑娘山大峰·相册2**（`siguniangshan-3.jpg`）：[File:四姑娘山景区 Mount Siguniang Scenic Area 39.jpg](https://commons.wikimedia.org/wiki/File%3A%E5%9B%9B%E5%A7%91%E5%A8%98%E5%B1%B1%E6%99%AF%E5%8C%BA%20Mount%20Siguniang%20Scenic%20Area%2039.jpg)，作者：George N，许可：CC BY 2.0
+- **四姑娘山大峰·相册3**（`siguniangshan-4.jpg`）：[File:四姑娘山景区 Mount Siguniang Scenic Area 27.jpg](https://commons.wikimedia.org/wiki/File%3A%E5%9B%9B%E5%A7%91%E5%A8%98%E5%B1%B1%E6%99%AF%E5%8C%BA%20Mount%20Siguniang%20Scenic%20Area%2027.jpg)，作者：George N，许可：CC BY 2.0
+- **恒山·相册1**（`hengshan_n-2.jpg`）：[File:Zhenyuan Dian, Heng Shan, Shanxi.jpg](https://commons.wikimedia.org/wiki/File%3AZhenyuan%20Dian%2C%20Heng%20Shan%2C%20Shanxi.jpg)，作者：Woudloper，许可：CC BY-SA 4.0
+- **恒山·相册2**（`hengshan_n-3.jpg`）：[File:恒山.jpg](https://commons.wikimedia.org/wiki/File%3A%E6%81%92%E5%B1%B1.jpg)，作者：Tyj1982338，许可：CC BY-SA 3.0
+- **衡山·相册1**（`hengshan_s-2.jpg`）：[File:Distant view of Mount Heng (Hunan), picture5.jpg](https://commons.wikimedia.org/wiki/File%3ADistant%20view%20of%20Mount%20Heng%20%28Hunan%29%2C%20picture5.jpg)，作者：Huangdan2060，许可：CC0
+- **衡山·相册2**（`hengshan_s-3.jpg`）：[File:Paifang, Mount Heng (Hunan), picture2.jpg](https://commons.wikimedia.org/wiki/File%3APaifang%2C%20Mount%20Heng%20%28Hunan%29%2C%20picture2.jpg)，作者：Huangdan2060，许可：CC0
+- **衡山·相册3**（`hengshan_s-4.jpg`）：[File:Zhurong Hall, Mount Heng (Hunan), picture5.jpg](https://commons.wikimedia.org/wiki/File%3AZhurong%20Hall%2C%20Mount%20Heng%20%28Hunan%29%2C%20picture5.jpg)，作者：Huangdan2060，许可：CC0
+- **嵩山·相册1**（`songshan-2.jpg`）：[File:Song Shan 01 (Song Mountain).jpg](https://commons.wikimedia.org/wiki/File%3ASong%20Shan%2001%20%28Song%20Mountain%29.jpg)，作者：Gary Todd，许可：CC0
+- **嵩山·相册2**（`songshan-3.jpg`）：[File:Song Shan 03.jpg](https://commons.wikimedia.org/wiki/File%3ASong%20Shan%2003.jpg)，作者：Gary Todd，许可：CC0
+- **嵩山·相册3**（`songshan-4.jpg`）：[File:Song Shan 02.jpg](https://commons.wikimedia.org/wiki/File%3ASong%20Shan%2002.jpg)，作者：Gary Todd，许可：CC0
+- **天门山·相册1**（`tianmenshan-2.jpg`）：[File:Tianmen 38330-Zhangjiajie (49047525877).jpg](https://commons.wikimedia.org/wiki/File:Tianmen_38330-Zhangjiajie_(49047525877).jpg)，作者：xiquinhosilva，许可：CC BY 2.0
+- **天门山·相册2**（`tianmenshan-3.jpg`）：[File:Zhangjiajie from Tianmen Mountain 01.jpg](https://commons.wikimedia.org/wiki/File:Zhangjiajie_from_Tianmen_Mountain_01.jpg)，作者：见 Commons 文件页，许可：见文件页
+- **天门山·相册3**（`tianmenshan-4.jpg`）：[File:Solar effect with Tianmen Mountain 01.jpg](https://commons.wikimedia.org/wiki/File:Solar_effect_with_Tianmen_Mountain_01.jpg)，作者：见 Commons 文件页，许可：见文件页
