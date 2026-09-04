@@ -165,15 +165,18 @@ def fetch_weather(coords, ids, target: date):
     results = data if isinstance(data, list) else [data]
     out = {}
     for mid, r in zip(ids, results):
+        out[mid] = None
         try:
             d = r["daily"]
             code = d["weather_code"][idx]
             prob = d["precipitation_probability_max"][idx]
             tmin = d["temperature_2m_min"][idx]
+            # 任一字段缺测（null）即放弃该山天气信号，避免脏数据影响榜单
+            if code is None or prob is None or tmin is None:
+                continue
             w = WMO.get(code, "多云")
             elev = next((m["elevation"] for m in MOUNTAINS_CACHE if m["id"] == mid), 0)
             summit = round(tmin - elev * 6.5 / 1000)
-            label = "周六" if target.weekday() == 5 else "周末"
             out[mid] = {
                 "text": f"{w}，降水概率 {prob}%，山顶夜温约 {summit}°C",
                 "short": w, "prob": prob, "summitTemp": summit,
@@ -263,7 +266,7 @@ def generate():
 
         # ---- 当季 ----
         s_score = base + (6 if in_season else 0) + (2.5 * len(hit_tags)) + seed_rand(m["id"] + str(today))
-        if w_score > 0:
+        if w_score > 0 and w_reason:
             s_score += w_score
             s_reason = f"{w_reason.split('，')[0]}，{hit_tags[0]}正当时" if hit_tags and in_season else w_reason
         elif c_reason:

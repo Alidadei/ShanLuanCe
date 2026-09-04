@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-05T00:03:51+08:00",
+  "generatedAt": "2026-09-05T00:15:14+08:00",
   "forDate": "2026-09-05",
   "week": 36,
   "weekendOf": "2026-09-05",
@@ -19,7 +19,7 @@
       "scenery": 4.9,
       "reason": "周末大致晴，夜爬正当时",
       "score": 24.54,
-      "weather": "大致晴，降水概率 0%，山顶约 1°C"
+      "weather": "大致晴，降水概率 0%，山顶夜温约 1°C"
     },
     {
       "id": "wugongshan",
@@ -32,7 +32,7 @@
       "scenery": 4.7,
       "reason": "9 月正当时：星空最佳观赏期，风景评分 4.7",
       "score": 23.49,
-      "weather": "强阵雨，降水概率 69%，山顶约 1°C"
+      "weather": "强阵雨，降水概率 69%，山顶夜温约 1°C"
     },
     {
       "id": "tianmenshan",
@@ -43,9 +43,9 @@
       "difficulty": 2,
       "difficultyLabel": "轻松",
       "scenery": 4.8,
-      "reason": "周末阴，降水概率仅 10%，山顶约 8°C",
+      "reason": "周末阴，降水概率仅 10%，山顶夜温约 8°C",
       "score": 22.05,
-      "weather": "阴，降水概率 10%，山顶约 8°C"
+      "weather": "阴，降水概率 10%，山顶夜温约 8°C"
     },
     {
       "id": "huangshan",
@@ -58,7 +58,7 @@
       "scenery": 5.0,
       "reason": "9 月正当时：日出最佳观赏期，风景评分 5.0",
       "score": 21.52,
-      "weather": "毛毛雨，降水概率 68%，山顶约 0°C"
+      "weather": "毛毛雨，降水概率 68%，山顶夜温约 0°C"
     },
     {
       "id": "lushan",
@@ -69,9 +69,9 @@
       "difficulty": 3,
       "difficultyLabel": "进阶",
       "scenery": 4.7,
-      "reason": "周末阵雨，降水概率仅 22%，山顶约 6°C",
+      "reason": "周末阵雨，降水概率仅 22%，山顶夜温约 6°C",
       "score": 21.51,
-      "weather": "阵雨，降水概率 22%，山顶约 6°C"
+      "weather": "阵雨，降水概率 22%，山顶夜温约 6°C"
     }
   ],
   "trending": [
@@ -86,7 +86,7 @@
       "scenery": 4.9,
       "reason": "本周热度上升 52%，夜爬主题搜索量激增；周末大致晴，正适合出发",
       "score": 18.77,
-      "weather": "大致晴，降水概率 0%，山顶约 1°C"
+      "weather": "大致晴，降水概率 0%，山顶夜温约 1°C"
     },
     {
       "id": "tianmenshan",
@@ -99,7 +99,7 @@
       "scenery": 4.8,
       "reason": "本周热度上升 45%，天门洞主题搜索量激增；周末阴，正适合出发",
       "score": 18.06,
-      "weather": "阴，降水概率 10%，山顶约 8°C"
+      "weather": "阴，降水概率 10%，山顶夜温约 8°C"
     },
     {
       "id": "songshan",
@@ -112,7 +112,7 @@
       "scenery": 4.5,
       "reason": "本周热度上升 51%，五岳主题搜索量激增；周末晴，正适合出发",
       "score": 17.86,
-      "weather": "晴，降水概率 0%，山顶约 7°C"
+      "weather": "晴，降水概率 0%，山顶夜温约 7°C"
     },
     {
       "id": "qingchengshan",
@@ -125,7 +125,7 @@
       "scenery": 4.5,
       "reason": "本周热度上升 39%，道教名山主题搜索量激增；周末阴，正适合出发",
       "score": 17.0,
-      "weather": "阴，降水概率 27%，山顶约 11°C"
+      "weather": "阴，降水概率 27%，山顶夜温约 11°C"
     },
     {
       "id": "xiangshan",
@@ -138,7 +138,7 @@
       "scenery": 4.3,
       "reason": "本周热度上升 45%，红叶主题搜索量激增；周末阴，正适合出发",
       "score": 16.95,
-      "weather": "阴，降水概率 0%，山顶约 15°C"
+      "weather": "阴，降水概率 0%，山顶夜温约 15°C"
     }
   ],
   "weekend": [
@@ -153,7 +153,7 @@
       "scenery": 4.7,
       "reason": "周末两天刚好走完（建议 2 天行程）",
       "score": 23.4,
-      "weather": "阵雨，降水概率 22%，山顶约 6°C"
+      "weather": "阵雨，降水概率 22%，山顶夜温约 6°C"
     },
     {
       "id": "taishan",
@@ -164,9 +164,9 @@
       "difficulty": 3,
       "difficultyLabel": "进阶",
       "scenery": 4.9,
-      "reason": "周末大致晴，降水概率 0%，山顶约 1°C，说走就走",
+      "reason": "周末大致晴，降水概率 0%，山顶夜温约 1°C，说走就走",
       "score": 20.8,
-      "weather": "大致晴，降水概率 0%，山顶约 1°C"
+      "weather": "大致晴，降水概率 0%，山顶夜温约 1°C"
     },
     {
       "id": "tianmenshan",
@@ -177,9 +177,9 @@
       "difficulty": 2,
       "difficultyLabel": "轻松",
       "scenery": 4.8,
-      "reason": "周末阴，降水概率 10%，山顶约 8°C，说走就走",
+      "reason": "周末阴，降水概率 10%，山顶夜温约 8°C，说走就走",
       "score": 20.6,
-      "weather": "阴，降水概率 10%，山顶约 8°C"
+      "weather": "阴，降水概率 10%，山顶夜温约 8°C"
     },
     {
       "id": "qingchengshan",
@@ -190,9 +190,9 @@
       "difficulty": 2,
       "difficultyLabel": "轻松",
       "scenery": 4.5,
-      "reason": "周末阴，降水概率 27%，山顶约 11°C，说走就走",
+      "reason": "周末阴，降水概率 27%，山顶夜温约 11°C，说走就走",
       "score": 20.0,
-      "weather": "阴，降水概率 27%，山顶约 11°C"
+      "weather": "阴，降水概率 27%，山顶夜温约 11°C"
     }
   ],
   "editors": [
