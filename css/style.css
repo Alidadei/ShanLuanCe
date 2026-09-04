@@ -344,6 +344,7 @@ ul { list-style: none; }
 .m-mini .art .scene { width: 100%; height: 100%; object-fit: cover; }
 .m-mini .body { padding: 8px 11px 10px; }
 .m-mini .name { font-size: 14px; font-weight: 700; }
+.mini-done { font-size: 11px; }
 .m-mini .sub {
   font-size: 11px;
   color: var(--muted);

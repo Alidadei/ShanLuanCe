@@ -1,10 +1,26 @@
 {
-  "version": 1,
-  "generatedAt": "2026-09-04T16:05:56Z",
-  "forDate": "2026-09-04",
+  "version": 2,
+  "generatedAt": "2026-09-05T00:03:51+08:00",
+  "forDate": "2026-09-05",
   "week": 36,
+  "weekendOf": "2026-09-05",
+  "holiday": null,
+  "weatherEnabled": true,
   "source": "github-actions",
   "seasonal": [
+    {
+      "id": "taishan",
+      "name": "泰山",
+      "emoji": "🌄",
+      "province": "山东 · 泰安",
+      "elevation": 1545,
+      "difficulty": 3,
+      "difficultyLabel": "进阶",
+      "scenery": 4.9,
+      "reason": "周末大致晴，夜爬正当时",
+      "score": 24.54,
+      "weather": "大致晴，降水概率 0%，山顶约 1°C"
+    },
     {
       "id": "wugongshan",
       "name": "武功山",
@@ -15,7 +31,21 @@
       "difficultyLabel": "进阶",
       "scenery": 4.7,
       "reason": "9 月正当时：星空最佳观赏期，风景评分 4.7",
-      "score": 23.26
+      "score": 23.49,
+      "weather": "强阵雨，降水概率 69%，山顶约 1°C"
+    },
+    {
+      "id": "tianmenshan",
+      "name": "天门山",
+      "emoji": "🚡",
+      "province": "湖南 · 张家界",
+      "elevation": 1518,
+      "difficulty": 2,
+      "difficultyLabel": "轻松",
+      "scenery": 4.8,
+      "reason": "周末阴，降水概率仅 10%，山顶约 8°C",
+      "score": 22.05,
+      "weather": "阴，降水概率 10%，山顶约 8°C"
     },
     {
       "id": "huangshan",
@@ -27,43 +57,21 @@
       "difficultyLabel": "困难",
       "scenery": 5.0,
       "reason": "9 月正当时：日出最佳观赏期，风景评分 5.0",
-      "score": 21.28
+      "score": 21.52,
+      "weather": "毛毛雨，降水概率 68%，山顶约 0°C"
     },
     {
-      "id": "siguniangshan",
-      "name": "四姑娘山大峰",
-      "emoji": "🏔️",
-      "province": "四川 · 阿坝",
-      "elevation": 5025,
-      "difficulty": 5,
-      "difficultyLabel": "挑战",
-      "scenery": 4.9,
-      "reason": "9 月正当时：雪山最佳观赏期，风景评分 4.9",
-      "score": 19.14
-    },
-    {
-      "id": "taishan",
-      "name": "泰山",
-      "emoji": "🌄",
-      "province": "山东 · 泰安",
-      "elevation": 1545,
+      "id": "lushan",
+      "name": "庐山",
+      "emoji": "💧",
+      "province": "江西 · 九江",
+      "elevation": 1474,
       "difficulty": 3,
       "difficultyLabel": "进阶",
-      "scenery": 4.9,
-      "reason": "9 月正当时：夜爬最佳观赏期，风景评分 4.9",
-      "score": 18.78
-    },
-    {
-      "id": "hengshan_s",
-      "name": "衡山",
-      "emoji": "🕯️",
-      "province": "湖南 · 衡阳",
-      "elevation": 1300,
-      "difficulty": 2,
-      "difficultyLabel": "轻松",
-      "scenery": 4.5,
-      "reason": "9 月正当时：日出最佳观赏期，风景评分 4.5",
-      "score": 18.06
+      "scenery": 4.7,
+      "reason": "周末阵雨，降水概率仅 22%，山顶约 6°C",
+      "score": 21.51,
+      "weather": "阵雨，降水概率 22%，山顶约 6°C"
     }
   ],
   "trending": [
@@ -76,8 +84,9 @@
       "difficulty": 3,
       "difficultyLabel": "进阶",
       "scenery": 4.9,
-      "reason": "本周热度上升 52%，夜爬主题搜索量激增",
-      "score": 12.77
+      "reason": "本周热度上升 52%，夜爬主题搜索量激增；周末大致晴，正适合出发",
+      "score": 18.77,
+      "weather": "大致晴，降水概率 0%，山顶约 1°C"
     },
     {
       "id": "tianmenshan",
@@ -88,8 +97,9 @@
       "difficulty": 2,
       "difficultyLabel": "轻松",
       "scenery": 4.8,
-      "reason": "本周热度上升 45%，天门洞主题搜索量激增",
-      "score": 12.06
+      "reason": "本周热度上升 45%，天门洞主题搜索量激增；周末阴，正适合出发",
+      "score": 18.06,
+      "weather": "阴，降水概率 10%，山顶约 8°C"
     },
     {
       "id": "songshan",
@@ -100,32 +110,89 @@
       "difficulty": 3,
       "difficultyLabel": "进阶",
       "scenery": 4.5,
-      "reason": "本周热度上升 51%，五岳主题搜索量激增",
-      "score": 11.86
+      "reason": "本周热度上升 51%，五岳主题搜索量激增；周末晴，正适合出发",
+      "score": 17.86,
+      "weather": "晴，降水概率 0%，山顶约 7°C"
     },
     {
-      "id": "hengshan_s",
-      "name": "衡山",
-      "emoji": "🕯️",
-      "province": "湖南 · 衡阳",
-      "elevation": 1300,
+      "id": "qingchengshan",
+      "name": "青城山",
+      "emoji": "☯️",
+      "province": "四川 · 都江堰",
+      "elevation": 1260,
       "difficulty": 2,
       "difficultyLabel": "轻松",
       "scenery": 4.5,
-      "reason": "本周热度上升 49%，日出主题搜索量激增",
-      "score": 11.74
+      "reason": "本周热度上升 39%，道教名山主题搜索量激增；周末阴，正适合出发",
+      "score": 17.0,
+      "weather": "阴，降水概率 27%，山顶约 11°C"
     },
     {
-      "id": "wugongshan",
-      "name": "武功山",
-      "emoji": "⛺",
-      "province": "江西 · 萍乡",
-      "elevation": 1918,
+      "id": "xiangshan",
+      "name": "香山",
+      "emoji": "🍁",
+      "province": "北京 · 海淀",
+      "elevation": 575,
+      "difficulty": 1,
+      "difficultyLabel": "休闲",
+      "scenery": 4.3,
+      "reason": "本周热度上升 45%，红叶主题搜索量激增；周末阴，正适合出发",
+      "score": 16.95,
+      "weather": "阴，降水概率 0%，山顶约 15°C"
+    }
+  ],
+  "weekend": [
+    {
+      "id": "lushan",
+      "name": "庐山",
+      "emoji": "💧",
+      "province": "江西 · 九江",
+      "elevation": 1474,
       "difficulty": 3,
       "difficultyLabel": "进阶",
       "scenery": 4.7,
-      "reason": "本周热度上升 42%，星空主题搜索量激增",
-      "score": 11.65
+      "reason": "周末两天刚好走完（建议 2 天行程）",
+      "score": 23.4,
+      "weather": "阵雨，降水概率 22%，山顶约 6°C"
+    },
+    {
+      "id": "taishan",
+      "name": "泰山",
+      "emoji": "🌄",
+      "province": "山东 · 泰安",
+      "elevation": 1545,
+      "difficulty": 3,
+      "difficultyLabel": "进阶",
+      "scenery": 4.9,
+      "reason": "周末大致晴，降水概率 0%，山顶约 1°C，说走就走",
+      "score": 20.8,
+      "weather": "大致晴，降水概率 0%，山顶约 1°C"
+    },
+    {
+      "id": "tianmenshan",
+      "name": "天门山",
+      "emoji": "🚡",
+      "province": "湖南 · 张家界",
+      "elevation": 1518,
+      "difficulty": 2,
+      "difficultyLabel": "轻松",
+      "scenery": 4.8,
+      "reason": "周末阴，降水概率 10%，山顶约 8°C，说走就走",
+      "score": 20.6,
+      "weather": "阴，降水概率 10%，山顶约 8°C"
+    },
+    {
+      "id": "qingchengshan",
+      "name": "青城山",
+      "emoji": "☯️",
+      "province": "四川 · 都江堰",
+      "elevation": 1260,
+      "difficulty": 2,
+      "difficultyLabel": "轻松",
+      "scenery": 4.5,
+      "reason": "周末阴，降水概率 27%，山顶约 11°C，说走就走",
+      "score": 20.0,
+      "weather": "阴，降水概率 27%，山顶约 11°C"
     }
   ],
   "editors": [
@@ -139,7 +206,8 @@
       "difficultyLabel": "困难",
       "scenery": 4.8,
       "reason": "峨眉山是普贤菩萨道场，从报国寺徒步至金顶约需两日，沿途古寺林立、林深雾绕",
-      "score": 14.4
+      "score": 14.4,
+      "weather": null
     },
     {
       "id": "tianmenshan",
@@ -151,7 +219,8 @@
       "difficultyLabel": "轻松",
       "scenery": 4.8,
       "reason": "天门山索道全长 7455 米，堪称世界最长高山客运索道之一",
-      "score": 14.4
+      "score": 14.4,
+      "weather": null
     },
     {
       "id": "wugongshan",
@@ -163,7 +232,8 @@
       "difficultyLabel": "进阶",
       "scenery": 4.7,
       "reason": "武功山以十万亩高山草甸闻名，春夏绿浪翻滚，秋季金黄一片",
-      "score": 14.1
+      "score": 14.1,
+      "weather": null
     }
   ]
 }

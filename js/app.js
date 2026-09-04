@@ -329,13 +329,13 @@ function mountainCard(m) {
   </div>`;
 }
 
-function mountainMini(m, sub) {
+function mountainMini(m, sub, climbed) {
   const d = distToMountain(m);
   return `
   <div class="m-mini" role="button" tabindex="0" aria-label="${esc(m.name)}" data-action="open-mountain" data-id="${m.id}">
     <div class="art">${mountainScene(m)}${d !== null ? `<span class="dist-tag">📍 ${fmtDist(d)}</span>` : ''}</div>
     <div class="body">
-      <div class="name">${m.emoji} ${esc(m.name)}</div>
+      <div class="name">${m.emoji} ${esc(m.name)}${climbed ? ' <span class="mini-done">✅</span>' : ''}</div>
       <div class="sub" title="${esc(sub || '')}">${esc(sub || `${m.province} · ${fmtNum(m.elevation)}m`)}</div>
     </div>
   </div>`;
@@ -451,17 +451,23 @@ function viewHome() {
   ${climbHomeCard()}
 
   <div class="section-title">
-    ${remoteRecs ? `今日精选 <small>📡 GitHub 推荐引擎 · ${esc(remoteRecs.forDate)} 更新</small>` : `为你推荐 <small>风景评分最高</small>`}
+    ${remoteRecs ? `今日精选 <small>📡 GitHub 推荐引擎 · ${esc(remoteRecs.forDate)} 更新${remoteRecs.weatherEnabled ? ' · 看天推荐' : ''}</small>` : `为你推荐 <small>风景评分最高</small>`}
   </div>
   ${remoteRecs
     ? `<div class="h-scroll">${remoteRecs.trending.map((r) => {
         const m = recMountain(r.id);
-        return m ? mountainMini(m, r.reason) : '';
+        return m ? mountainMini(m, r.reason, s.ids.has(r.id)) : '';
       }).join('')}</div>
-    <div class="section-title">当季最佳 <small>${remoteRecs.week} 周 · 按季节与热度评分</small></div>
+    <div class="section-title">当季最佳 <small>${remoteRecs.week} 周 · 季节与热度评分</small></div>
     <div class="chips-row">
       ${remoteRecs.seasonal.map((r) => `<button type="button" class="chip" data-action="open-mountain" data-id="${r.id}" title="${esc(r.reason)}">${r.emoji} ${esc(r.name)}</button>`).join('')}
-    </div>`
+    </div>
+    ${Array.isArray(remoteRecs.weekend) && remoteRecs.weekend.length ? `
+    <div class="section-title">周末就出发 <small>${esc(remoteRecs.weekendOf || '')} 周末 · 结合天气预报</small></div>
+    <div class="h-scroll">${remoteRecs.weekend.map((r) => {
+      const m = recMountain(r.id);
+      return m ? mountainMini(m, r.reason, s.ids.has(r.id)) : '';
+    }).join('')}</div>` : ''}`
     : `<div class="h-scroll">${featured.map((m) => mountainMini(m)).join('')}</div>`}
 
   <div class="section-title">热门主题 <small>点击直达</small></div>
