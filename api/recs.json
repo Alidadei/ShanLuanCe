@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-03T18:52:23Z",
-  "forDate": "2026-09-03",
+  "generatedAt": "2026-09-04T08:04:49Z",
+  "forDate": "2026-09-04",
   "week": 36,
   "source": "github-actions",
   "seasonal": [
@@ -15,7 +15,7 @@
       "difficultyLabel": "进阶",
       "scenery": 4.7,
       "reason": "9 月正当时：星空最佳观赏期，风景评分 4.7",
-      "score": 22.92
+      "score": 23.26
     },
     {
       "id": "huangshan",
@@ -27,19 +27,7 @@
       "difficultyLabel": "困难",
       "scenery": 5.0,
       "reason": "9 月正当时：日出最佳观赏期，风景评分 5.0",
-      "score": 22.0
-    },
-    {
-      "id": "taishan",
-      "name": "泰山",
-      "emoji": "🌄",
-      "province": "山东 · 泰安",
-      "elevation": 1545,
-      "difficulty": 3,
-      "difficultyLabel": "进阶",
-      "scenery": 4.9,
-      "reason": "9 月正当时：夜爬最佳观赏期，风景评分 4.9",
-      "score": 19.11
+      "score": 21.28
     },
     {
       "id": "siguniangshan",
@@ -51,7 +39,19 @@
       "difficultyLabel": "挑战",
       "scenery": 4.9,
       "reason": "9 月正当时：雪山最佳观赏期，风景评分 4.9",
-      "score": 18.9
+      "score": 19.14
+    },
+    {
+      "id": "taishan",
+      "name": "泰山",
+      "emoji": "🌄",
+      "province": "山东 · 泰安",
+      "elevation": 1545,
+      "difficulty": 3,
+      "difficultyLabel": "进阶",
+      "scenery": 4.9,
+      "reason": "9 月正当时：夜爬最佳观赏期，风景评分 4.9",
+      "score": 18.78
     },
     {
       "id": "hengshan_s",
@@ -63,7 +63,7 @@
       "difficultyLabel": "轻松",
       "scenery": 4.5,
       "reason": "9 月正当时：日出最佳观赏期，风景评分 4.5",
-      "score": 18.34
+      "score": 18.06
     }
   ],
   "trending": [
