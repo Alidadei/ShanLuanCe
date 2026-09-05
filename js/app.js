@@ -1,4 +1,4 @@
-/* 爬山趣 · 应用逻辑 */
+/* 山峦册 · 应用逻辑 */
 'use strict';
 
 /* ================= 工具 ================= */
@@ -121,12 +121,18 @@ async function maybeAutoLocate() {
 }
 
 /* ================= 存储 ================= */
-const STORE_KEY = 'xunshance.v1';
-const LEGACY_KEY = 'pashanqu.v1'; // 更名前的旧存储键
+const STORE_KEY = 'shanluance.v1';
+const LEGACY_KEYS = ['xunshance.v1', 'pashanqu.v1']; // 历史存储键，自动迁移
 
-/* 老用户数据自动迁移到新键（保留旧键以防回滚） */
-if (!localStorage.getItem(STORE_KEY) && localStorage.getItem(LEGACY_KEY)) {
-  try { localStorage.setItem(STORE_KEY, localStorage.getItem(LEGACY_KEY)); } catch { /* 忽略 */ }
+/* 老用户数据沿迁移链自动带到新键（保留旧键以防回滚） */
+if (!localStorage.getItem(STORE_KEY)) {
+  for (const legacy of LEGACY_KEYS) {
+    const raw = localStorage.getItem(legacy);
+    if (raw) {
+      try { localStorage.setItem(STORE_KEY, raw); } catch { /* 忽略 */ }
+      break;
+    }
+  }
 }
 
 const okAvatar = (v) =>
@@ -436,7 +442,7 @@ function viewHome() {
       ${mountainScene({ id: 'hero', colors: ['#1b4332', '#52b788', '#2d6a4f', '#123527'] })}
       <div class="hero-content">
         <div class="hello">你好，${esc(state.nickname)} ${dayEmoji}</div>
-        <h1>巡山册</h1>
+        <h1>山峦册</h1>
         <div class="slogan">会当凌绝顶，一览众山小</div>
         <div class="hero-stats">
           <div class="hstat"><b>${s.count}</b><span>打卡次数</span></div>
@@ -798,7 +804,7 @@ function viewProfile() {
     <button class="btn btn-ghost" data-action="import-gpx">📥 导入 GPX 轨迹</button>
     <button class="btn btn-danger-ghost" data-action="clear">🗑️ 清空记录</button>
   </div>
-  <div style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:22px">巡山册 v3.0 · 步步登峰 · 数据仅保存在本机</div>
+  <div style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:22px">山峦册 v3.3 · 步步登峰 · 数据仅保存在本机</div>
   `;
 }
 
@@ -1579,7 +1585,7 @@ function certSvg(h) {
     <text y="-12" text-anchor="middle" font-size="26" fill="#c0392b" font-weight="900" font-family="KaiTi, STKaiti, serif">登顶</text>
     <text y="24" text-anchor="middle" font-size="17" fill="#c0392b" font-weight="700" font-family="KaiTi, STKaiti, serif">${esc(ch.name)}</text>
   </g>
-  <text x="150" y="850" font-size="15" fill="#8ba397">爬山趣 · 山灵认证</text>
+  <text x="150" y="850" font-size="15" fill="#8ba397">山峦册 · 山灵认证</text>
   <text x="150" y="878" font-size="15" fill="#8ba397">凭日常脚步，抵山川之巅</text>
 </svg>`;
 }
@@ -1958,10 +1964,10 @@ function handleAction(t) {
       }
       break;
     case 'export': {
-      const blob = new Blob([JSON.stringify({ app: '巡山册', exportedAt: new Date().toISOString(), ...state }, null, 2)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify({ app: '山峦册', exportedAt: new Date().toISOString(), ...state }, null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `巡山册备份-${todayStr()}.json`;
+      a.download = `山峦册备份-${todayStr()}.json`;
       a.click();
       URL.revokeObjectURL(a.href);
       toast('备份已导出 ⬇️');
@@ -2080,7 +2086,7 @@ let pwaInstallEvent = null;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   pwaInstallEvent = e;
-  if (!localStorage.getItem('xsc.installDismissed')) showInstallBanner('android');
+  if (!localStorage.getItem('slc.installDismissed')) showInstallBanner('android');
 });
 
 window.addEventListener('appinstalled', () => {
@@ -2100,17 +2106,17 @@ function showInstallBanner(kind) {
   banner.id = 'pwa-banner';
   banner.innerHTML = kind === 'ios'
     ? `<span class="pb-icon" aria-hidden="true">📲</span>
-       <div class="pb-txt"><b>把巡山册装到桌面</b><small>点浏览器底部 <b>分享 ⬆️</b> → 选择「添加到主屏幕」，山里没信号也能用</small></div>
+       <div class="pb-txt"><b>把山峦册装到桌面</b><small>点浏览器底部 <b>分享 ⬆️</b> → 选择「添加到主屏幕」，山里没信号也能用</small></div>
        <button class="pb-close" aria-label="关闭">✕</button>`
     : `<span class="pb-icon" aria-hidden="true">📲</span>
-       <div class="pb-txt"><b>安装巡山册 APP</b><small>装到桌面，全屏体验 · 离线可用</small></div>
+       <div class="pb-txt"><b>安装山峦册 APP</b><small>装到桌面，全屏体验 · 离线可用</small></div>
        <button class="pb-btn" data-install>安装</button>
        <button class="pb-close" aria-label="关闭">✕</button>`;
   document.body.appendChild(banner);
   requestAnimationFrame(() => banner.classList.add('show'));
   banner.querySelector('.pb-close').onclick = () => {
     banner.classList.remove('show');
-    localStorage.setItem('xsc.installDismissed', String(Date.now()));
+    localStorage.setItem('slc.installDismissed', String(Date.now()));
     setTimeout(() => banner.remove(), 300);
   };
   const btn = banner.querySelector('[data-install]');
@@ -2129,7 +2135,7 @@ function showInstallBanner(kind) {
 /* 首次访问后 3 秒，给 iOS 用户显示手动添加引导（7 天内不再打扰） */
 setTimeout(() => {
   try {
-    if (isIosStandalone() && !localStorage.getItem('xsc.installDismissed')) showInstallBanner('ios');
+    if (isIosStandalone() && !localStorage.getItem('slc.installDismissed')) showInstallBanner('ios');
   } catch { /* 隐私模式忽略 */ }
 }, 3000);
 

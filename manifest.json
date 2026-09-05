@@ -1,7 +1,7 @@
 {
-  "name": "巡山册 · 记录每一次登顶",
-  "short_name": "巡山册",
-  "description": "收录 45 座名山，步步登峰的登山小册子",
+  "name": "山峦册 · 山峰信息收集册",
+  "short_name": "山峦册",
+  "description": "收录 45 座名山的信息收集册，附打卡与虚拟登山",
   "lang": "zh-CN",
   "start_url": "./",
   "scope": "./",

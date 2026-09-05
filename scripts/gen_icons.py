@@ -39,17 +39,17 @@ def make_icon(size: int, maskable: bool = False) -> Image.Image:
     # 「巡」字
     fs = int(seal * 0.62)
     font = ImageFont.truetype(FONT, fs)
-    bbox = d.textbbox((0, 0), "巡", font=font)
+    bbox = d.textbbox((0, 0), "山", font=font)
     w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    d.text((x0 + (seal - w) / 2 - bbox[0], y0 + (seal - h) / 2 - bbox[1]), "巡",
+    d.text((x0 + (seal - w) / 2 - bbox[0], y0 + (seal - h) / 2 - bbox[1]), "山",
            font=font, fill=PAPER)
 
     # 底部小字「山」点缀（仅非 maskable 大图）
     if not maskable and size >= 192:
         f2 = ImageFont.truetype(FONT, int(size * 0.075))
-        b2 = d.textbbox((0, 0), "巡山册", font=f2)
+        b2 = d.textbbox((0, 0), "山峦册", font=f2)
         d.text(((size - (b2[2] - b2[0])) / 2, y0 + seal + size * 0.015),
-               "巡山册", font=f2, fill=INK)
+               "山峦册", font=f2, fill=INK)
 
     return img
 

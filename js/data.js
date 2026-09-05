@@ -1,4 +1,4 @@
-/* 爬山趣 · 山峰数据 */
+/* 山峦册 · 山峰数据 */
 'use strict';
 
 const MOUNTAINS = [
