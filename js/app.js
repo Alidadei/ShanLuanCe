@@ -2068,5 +2068,70 @@ document.addEventListener('change', (e) => {
 });
 
 window.addEventListener('hashchange', route);
+
+/* ================= PWA：Service Worker 与安装引导 ================= */
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => { /* 静默失败 */ });
+  });
+}
+
+let pwaInstallEvent = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  pwaInstallEvent = e;
+  if (!localStorage.getItem('xsc.installDismissed')) showInstallBanner('android');
+});
+
+window.addEventListener('appinstalled', () => {
+  pwaInstallEvent = null;
+  $('#pwa-banner')?.remove();
+});
+
+function isIosStandalone() {
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  return ios && !window.navigator.standalone;
+}
+
+function showInstallBanner(kind) {
+  if ($('#pwa-banner')) return;
+  const banner = document.createElement('div');
+  banner.className = 'pwa-banner';
+  banner.id = 'pwa-banner';
+  banner.innerHTML = kind === 'ios'
+    ? `<span class="pb-icon" aria-hidden="true">📲</span>
+       <div class="pb-txt"><b>把巡山册装到桌面</b><small>点浏览器底部 <b>分享 ⬆️</b> → 选择「添加到主屏幕」，山里没信号也能用</small></div>
+       <button class="pb-close" aria-label="关闭">✕</button>`
+    : `<span class="pb-icon" aria-hidden="true">📲</span>
+       <div class="pb-txt"><b>安装巡山册 APP</b><small>装到桌面，全屏体验 · 离线可用</small></div>
+       <button class="pb-btn" data-install>安装</button>
+       <button class="pb-close" aria-label="关闭">✕</button>`;
+  document.body.appendChild(banner);
+  requestAnimationFrame(() => banner.classList.add('show'));
+  banner.querySelector('.pb-close').onclick = () => {
+    banner.classList.remove('show');
+    localStorage.setItem('xsc.installDismissed', String(Date.now()));
+    setTimeout(() => banner.remove(), 300);
+  };
+  const btn = banner.querySelector('[data-install]');
+  if (btn) {
+    btn.onclick = async () => {
+      if (!pwaInstallEvent) return;
+      pwaInstallEvent.prompt();
+      await pwaInstallEvent.userChoice;
+      pwaInstallEvent = null;
+      banner.classList.remove('show');
+      setTimeout(() => banner.remove(), 300);
+    };
+  }
+}
+
+/* 首次访问后 3 秒，给 iOS 用户显示手动添加引导（7 天内不再打扰） */
+setTimeout(() => {
+  try {
+    if (isIosStandalone() && !localStorage.getItem('xsc.installDismissed')) showInstallBanner('ios');
+  } catch { /* 隐私模式忽略 */ }
+}, 3000);
+
 fetchRecs();
 route();
