@@ -432,36 +432,23 @@ function viewHome() {
   const near = nearestMountain();
   const featured = [...MOUNTAINS].sort((a, b) => b.scenery - a.scenery).slice(0, 6);
   const themes = ['看日出', '夜爬', '云海', '红叶', '高山草甸', '佛教名山', '道教名山', '五岳'];
-  const latest = sortedRecords().slice(0, 3);
-  const brief = agentBriefing();
   const h = new Date().getHours();
-  const dayEmoji = h < 6 || h >= 19 ? '🌙' : h < 11 ? '🌅' : h < 15 ? '☀️' : '🌤️';
+  const greet = h < 6 ? '夜深了' : h < 11 ? '早上好' : h < 14 ? '中午好' : h < 18 ? '下午好' : '晚上好';
+  const days = Math.max(1, Math.ceil((Date.now() - (state.joinedAt || Date.now())) / 864e5));
   return `
   <div class="hero">
     <div class="scene-wrap">
       ${mountainScene({ id: 'hero', colors: ['#1b4332', '#52b788', '#2d6a4f', '#123527'] })}
       <div class="hero-content">
-        <div class="hello">你好，${esc(state.nickname)} ${dayEmoji}</div>
+        <button type="button" class="hero-me" data-action="edit-profile" aria-label="编辑资料">
+          <span class="hm-ava">${avatarHtml(state.avatar)}</span>
+          <span class="hm-info"><b>${esc(state.nickname)}</b><small>${greet} · 已同行 ${days} 天</small></span>
+        </button>
         <h1>山峦册</h1>
         <div class="slogan">会当凌绝顶，一览众山小</div>
-        <div class="hero-stats">
-          <div class="hstat"><b>${s.count}</b><span>打卡次数</span></div>
-          <div class="hstat"><b>${s.distinct}</b><span>登顶山峰</span></div>
-          <div class="hstat"><b>${fmtNum(s.elev)}m</b><span>累计海拔</span></div>
-        </div>
         ${near ? `<div class="near-line">📍 离你最近：${esc(near.m.name)} · 约 ${fmtDist(near.d)}</div>` : ''}
       </div>
     </div>
-  </div>
-
-  <div class="brief-card">
-    <div class="brief-head">
-      <span class="brief-ava" aria-hidden="true">🏔️</span>
-      <div class="brief-title"><b>山灵说</b><small>AI 登山搭子</small></div>
-      <button type="button" class="chip" data-action="open-chat">💬 聊聊</button>
-    </div>
-    <p class="brief-text">${esc(brief.text).replace(/\n/g, '<br>')}</p>
-    ${brief.rec ? chatCard(brief.rec.m.id) : ''}
   </div>
 
   ${climbHomeCard()}
@@ -490,11 +477,6 @@ function viewHome() {
   <div class="chips-row">
     ${themes.map((t) => `<button type="button" class="chip" data-action="theme" data-tag="${esc(t)}"># ${esc(t)}</button>`).join('')}
   </div>
-
-  <div class="section-title">最近打卡 <small>${s.count} 条记录</small></div>
-  ${latest.length
-    ? latest.map((r) => feedItem(r)).join('')
-    : `<div class="card empty"><div class="empty-icon">🥾</div>还没有打卡记录<br>从登顶第一座山开始吧<div><button class="btn btn-primary" data-action="checkin">✓ 立即打卡</button></div></div>`}
   `;
 }
 
@@ -749,7 +731,6 @@ function viewRecords() {
 
 /* ================= 视图：我的 ================= */
 function viewProfile() {
-  const s = computeStats();
   const unlocked = new Set(unlockedIds());
   const days = Math.max(1, Math.ceil((Date.now() - (state.joinedAt || Date.now())) / 864e5));
   const firstClimb = new Map();
@@ -762,12 +743,6 @@ function viewProfile() {
       <div class="nick">${esc(state.nickname)} <span class="edit-hint">✏️ 编辑资料</span></div>
       <div class="motto">${esc(state.motto)} · 已同行 ${days} 天</div>
     </div>
-  </div>
-
-  <div class="me-stats">
-    <div class="ms"><b>${s.count}</b><span>打卡次数</span></div>
-    <div class="ms"><b>${s.distinct}</b><span>登顶山峰</span></div>
-    <div class="ms"><b>${fmtNum(s.elev)}m</b><span>累计海拔</span></div>
   </div>
 
   <div class="section-title">成就徽章 <small>${unlocked.size}/${ACHIEVEMENTS.length} 已解锁</small></div>
@@ -1163,23 +1138,6 @@ function chatReply(text) {
     text: `${intro}\n\n${detail}\n\n点击卡片可看路线详情，也可以直接问我“XX山怎么爬”。`,
     cards: picks.map((p) => p.m.id),
   };
-}
-
-function agentBriefing() {
-  const s = computeStats();
-  const near = nearestMountain();
-  const h = new Date().getHours();
-  const greet = h < 6 ? '夜深了' : h < 11 ? '早上好' : h < 14 ? '中午好' : h < 18 ? '下午好' : '晚上好';
-  const bits = [];
-  if (s.count) bits.push(`你已登顶 ${s.distinct} 座、累计 ${fmtNum(s.elev)} 米。${nextGoalHint()}`);
-  else bits.push('手账还是空白的——不如这个周末就去登顶第一座山');
-  if (near) bits.push(`离你最近的是${near.m.name}（约 ${fmtDist(near.d)}）`);
-  if (state.climb) {
-    const ci = climbInfo();
-    if (ci) bits.push(`步步登峰已爬升 ${Math.round(ci.frac * 100)}%，当前在${ci.pos ? ci.pos.name : '山脚'}`);
-  }
-  const rec = recommendMountains(parseIntent(''), 1)[0];
-  return { text: `${greet}，${state.nickname}！${bits.join('。')}。今日推荐 ↓`, rec };
 }
 
 /* ================= 山灵 · 聊天界面 ================= */
