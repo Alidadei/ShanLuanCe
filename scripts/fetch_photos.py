@@ -50,10 +50,10 @@ M = {
     "jigongshan": (r"ji\s?gong|鸡公山", ["Jigongshan", "鸡公山", "Jigong Mountain"]),
     "yandangshan": (r"yan\s?dang|雁荡山", ["Yandangshan", "雁荡山", "Yandang Mountain"]),
     "tianmushan": (r"tian\s?mu|天目山", ["Tianmu Mountain", "天目山", "Tianmushan"]),
-    "moganshan": (r"mo\s?gan|莫干山", ["Moganshan", "莫干山", "Mogan Mountain"]),
+    "moganshan": (r"moganshan|mo\s?gan\s?shan|莫干山", ["Moganshan", "莫干山", "Mogan Mountain Deqing"]),
     "laoshan": (r"lao\s?shan|崂山", ["Laoshan Qingdao", "崂山", "Mount Lao"]),
     "sanqingshan": (r"san\s?qing|三清山", ["Sanqingshan", "三清山", "Mount Sanqing"]),
-    "jinggangshan": (r"jing\s?gang|井冈山", ["Jinggangshan", "井冈山", "Jinggang Mountains"]),
+    "jinggangshan": (r"jing\s?gang\s?shan|井冈山", ["Jinggangshan mountain", "井冈山杜鹃", "Jinggang Mountains scenery"]),
     "longhushan": (r"long\s?hu|龙虎山", ["Longhushan", "龙虎山", "Mount Longhu"]),
     "danxiashan": (r"dan\s?xia|丹霞山", ["Danxiashan", "丹霞山", "Mount Danxia"]),
     "maoershan": (r"mao\s?er|猫儿山", ["Maoershan Guangxi", "猫儿山", "Cat Mountain Guangxi"]),
@@ -78,9 +78,16 @@ def get(url, use_proxy=False, tries=3):
             req = urllib.request.Request(url, headers=HEADERS)
             with opener.open(req, timeout=25) as r:
                 return r.read()
+        except urllib.error.HTTPError as e:
+            if e.code == 429:  # Commons 限流：长退避后重试
+                print(f"    429 限流，等待 45s…")
+                time.sleep(45)
+                last = e
+                continue
+            raise
         except Exception as e:
             last = e
-            if "SSL" in str(e) or "EOF" in str(e) or "timed out" in str(e):
+            if "SSL" in str(e) or "EOF" in str(e) or "timed out" in str(e) or "10054" in str(e):
                 time.sleep(1.2 * (i + 1))
                 continue
             raise
@@ -88,6 +95,10 @@ def get(url, use_proxy=False, tries=3):
 
 
 def get_with_fallback(url):
+    # commons 直连不可达时可用环境变量 FORCE_PROXY=1 跳过直连阶段
+    import os
+    if os.environ.get("FORCE_PROXY"):
+        return get(url, use_proxy=True)
     try:
         return get(url)
     except Exception as e1:
@@ -115,7 +126,7 @@ def search(pattern, query):
             continue
         if not (1.05 <= (w / h if h else 0) <= 2.6):
             continue
-        if re.search(r"map|地图|diagram|logo|station|airport|ticket|游客中心|入口|gate", title, re.I):
+        if re.search(r"map|地图|diagram|logo|station|airport|ticket|游客中心|入口|gate|bird|dove|bridge|sedan|railway|train|painting|zhuhai|珠海", title, re.I):
             continue
         if not re.search(pattern, title, re.I):
             continue  # 标题必须命中山名
@@ -159,6 +170,7 @@ def main(force=False):
         pool = []
         for q in queries:
             print(f"[{mid}] 搜索：{q}")
+            time.sleep(2.5)  # 防限流
             try:
                 cands = search(pattern, q)
             except Exception as e:
