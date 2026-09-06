@@ -285,6 +285,27 @@ ul { list-style: none; }
   background: var(--pine-deep);
 }
 .hero .scene-wrap { position: relative; }
+.hero .painting {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 62%;
+  filter: saturate(.96);
+}
+.hero .hero-attribution {
+  position: absolute;
+  right: 12px;
+  bottom: 9px;
+  z-index: 3;
+  font-family: var(--serif);
+  font-size: 10px;
+  letter-spacing: .12em;
+  color: rgba(250, 248, 242, .6);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, .4);
+  pointer-events: none;
+}
 .hero .hero-content {
   position: absolute;
   inset: 0;

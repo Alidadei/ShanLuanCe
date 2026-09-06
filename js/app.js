@@ -439,6 +439,8 @@ function viewHome() {
   <div class="hero">
     <div class="scene-wrap">
       ${mountainScene({ id: 'hero', colors: ['#1b4332', '#52b788', '#2d6a4f', '#123527'] })}
+      <img class="painting" src="img/hero-qianli.jpg" alt="《千里江山图》局部" onerror="this.remove()">
+      <span class="hero-attribution" aria-hidden="true">《千里江山图》· 北宋 王希孟</span>
       <div class="hero-content">
         <button type="button" class="hero-me" data-action="edit-profile" aria-label="编辑资料">
           <span class="hm-ava">${avatarHtml(state.avatar)}</span>
