@@ -56,8 +56,21 @@ body {
 }
 
 .page {
+  position: relative;
+  z-index: 1;
   padding: 20px 18px calc(100px + env(safe-area-inset-bottom));
   animation: pageIn .32s cubic-bezier(.2, .8, .3, 1) both;
+}
+.page-watermark {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 520px;
+  height: 108px;
+  z-index: 0;
+  pointer-events: none;
 }
 @keyframes pageIn {
   from { opacity: 0; transform: translateY(10px); }
@@ -199,7 +212,13 @@ ul { list-style: none; }
   font-size: 13.5px;
   letter-spacing: .04em;
 }
-.empty .empty-icon { font-size: 42px; margin-bottom: 12px; filter: saturate(.8); }
+.empty .ink-mini {
+  width: 170px;
+  height: auto;
+  display: block;
+  margin: 0 auto 12px;
+  opacity: .92;
+}
 .empty .btn { margin-top: 16px; }
 
 /* ============ 底部导航 ============ */
@@ -776,6 +795,8 @@ ul { list-style: none; }
 
 /* ============ 记录 ============ */
 .summary-card {
+  position: relative;
+  overflow: hidden;
   background:
     radial-gradient(600px 200px at 85% -60px, rgba(184, 68, 44, .18), transparent 60%),
     linear-gradient(150deg, #143326, var(--pine-deep) 45%, var(--pine));
@@ -784,6 +805,27 @@ ul { list-style: none; }
   padding: 19px;
   box-shadow: var(--shadow-lg);
 }
+.summary-card .sc-painting {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(.72) saturate(.96);
+}
+.summary-card .sc-attribution {
+  position: absolute;
+  right: 13px;
+  top: 12px;
+  font-family: var(--serif);
+  font-size: 10px;
+  letter-spacing: .12em;
+  color: rgba(250, 248, 242, .55);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, .4);
+  pointer-events: none;
+}
+.summary-card .row,
+.summary-card .summary-grid { position: relative; z-index: 1; }
 .summary-card .row { display: flex; align-items: center; justify-content: space-between; }
 .summary-card h2 {
   font-size: 17px;
@@ -1486,7 +1528,16 @@ ul { list-style: none; }
 }
 
 /* ============ 步步登峰 ============ */
-.climb-head { padding: 4px 2px 2px; }
+.climb-head { position: relative; padding: 4px 2px 2px; }
+.climb-head-ink {
+  position: absolute;
+  right: -8px;
+  top: -10px;
+  width: 168px;
+  height: auto;
+  pointer-events: none;
+}
+.climb-head h2, .climb-head p { position: relative; }
 .climb-head h2 {
   font-family: var(--serif);
   font-size: 25px;
@@ -1621,6 +1672,45 @@ ul { list-style: none; }
   box-shadow: var(--shadow-md);
 }
 .cert-wrap svg { width: 100%; height: auto; display: block; }
+
+/* 姓名章 */
+.name-seal {
+  width: 21px;
+  height: 21px;
+  border-radius: 4px;
+  background: var(--cinnabar);
+  color: #fbf9f2;
+  font-family: var(--serif);
+  font-size: 12.5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-2deg);
+  box-shadow: inset 0 0 0 1px rgba(251, 249, 242, .35), 0 1px 3px rgba(150, 53, 29, .35);
+  flex-shrink: 0;
+}
+
+/* 卷轴分隔 */
+.scroll-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 26px 0 0;
+}
+.scroll-divider::before,
+.scroll-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line) 25%, var(--line) 75%, transparent);
+}
+.scroll-divider .sd-dot {
+  width: 6px;
+  height: 6px;
+  transform: rotate(45deg);
+  background: var(--cinnabar);
+  opacity: .7;
+}
 
 /* ============ 实景相册 ============ */
 .album-strip {

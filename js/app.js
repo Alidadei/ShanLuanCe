@@ -249,6 +249,25 @@ const unlockedIds = () => ACHIEVEMENTS.filter((a) => a.test(computeStats())).map
 let uidCounter = 0;
 const uid = () => ++uidCounter;
 
+/* 留白小景：空状态的水墨配图，seal 为角印章字 */
+function inkMini(seal = '山') {
+  const KAI = 'Kaiti SC, STKaiti, KaiTi, serif';
+  return `
+  <svg class="ink-mini" viewBox="0 0 220 92" aria-hidden="true">
+    <g fill="#5d6e66" opacity=".28">
+      <path d="M0,58 L34,34 L62,54 L96,26 L130,56 L164,38 L196,56 L220,46 L220,92 L0,92 Z"/>
+    </g>
+    <g fill="#3a4a42" opacity=".5">
+      <path d="M0,70 L44,48 L86,68 L128,44 L172,70 L220,56 L220,92 L0,92 Z"/>
+    </g>
+    <g stroke="#5d6e66" stroke-width="1" opacity=".5" stroke-linecap="round" fill="none">
+      <path d="M30,80 h26 M44,85 h34 M150,82 h24"/>
+    </g>
+    <rect x="198" y="10" width="13" height="13" rx="2" fill="#b8442c" opacity=".85"/>
+    <text x="204.5" y="20" font-size="8.5" fill="#fbf9f2" text-anchor="middle" font-family="${KAI}">${seal}</text>
+  </svg>`;
+}
+
 /* 实景照片：加载失败自动移除，露出下层 SVG 山景兜底 */
 const photoTag = (m) =>
   `<img class="photo" src="img/${m.id}.jpg" alt="${esc(m.name)}实景" loading="lazy" onerror="this.remove()">`;
@@ -555,7 +574,7 @@ function viewExplore() {
   <div class="result-count">共 ${list.length} 座山</div>
   ${list.length
     ? `<div class="m-grid">${list.map(mountainCard).join('')}</div>`
-    : `<div class="card empty"><div class="empty-icon">🔍</div>没有找到符合条件的山<br>换个关键词试试</div>`}
+    : `<div class="card empty">${inkMini('寻')}没有找到符合条件的山<br>换个关键词试试</div>`}
   `;
 }
 
@@ -707,6 +726,8 @@ function viewRecords() {
   const list = sortedRecords();
   return `
   <div class="summary-card">
+    <img class="sc-painting" src="img/rec-qianli.jpg" alt="" onerror="this.remove()">
+    <span class="sc-attribution" aria-hidden="true">《千里江山图》· 卷末</span>
     <div class="row">
       <div>
         <h2>我的登山手账</h2>
@@ -727,7 +748,7 @@ function viewRecords() {
   <div class="section-title">全部记录 <small>共 ${list.length} 条</small></div>
   ${list.length
     ? list.map((r) => feedItem(r, { deletable: true })).join('')
-    : `<div class="card empty"><div class="empty-icon">📔</div>手账还是空的<br>去山顶写下第一页吧<div><a class="btn btn-primary" href="#/explore">去发现名山</a></div></div>`}
+    : `<div class="card empty">${inkMini('记')}手账还是空的<br>去山顶写下第一页吧<div><a class="btn btn-primary" href="#/explore">去发现名山</a></div></div>`}
   `;
 }
 
@@ -742,7 +763,7 @@ function viewProfile() {
   <div class="me-card" role="button" tabindex="0" aria-label="编辑资料" data-action="edit-profile" title="编辑资料">
     <div class="avatar">${avatarHtml(state.avatar)}</div>
     <div class="me-info">
-      <div class="nick">${esc(state.nickname)} <span class="edit-hint">✏️ 编辑资料</span></div>
+      <div class="nick">${esc(state.nickname)} <span class="name-seal" title="姓名章" aria-hidden="true">${esc((state.nickname.trim()[0] || '山'))}</span> <span class="edit-hint">✏️ 编辑资料</span></div>
       <div class="motto">${esc(state.motto)} · 已同行 ${days} 天</div>
     </div>
   </div>
@@ -759,6 +780,8 @@ function viewProfile() {
       <div class="ach-state">${unlocked.has(a.id) ? '已解锁' : '🔒'}</div>
     </div>`).join('')}
   </div>
+
+  <div class="scroll-divider" aria-hidden="true"><span class="sd-dot"></span></div>
 
   <div class="section-title">山峰护照 <small>${climbedCount}/${MOUNTAINS.length} 已集章</small></div>
   <div class="passport">
@@ -1594,6 +1617,11 @@ function viewClimb() {
   const last = hist[0];
   return `
   <div class="climb-head">
+    <svg class="climb-head-ink" viewBox="0 0 300 70" aria-hidden="true">
+      <g fill="#5d6e66" opacity=".22"><path d="M120,44 L160,18 L196,40 L238,12 L276,42 L300,30 L300,70 L120,70 Z"/></g>
+      <g fill="#3a4a42" opacity=".3"><path d="M150,58 L192,32 L228,54 L266,30 L300,52 L300,70 L150,70 Z"/></g>
+      <g stroke="#5d6e66" stroke-width="1" opacity=".4" stroke-linecap="round" fill="none"><path d="M170,64 h24 M182,68 h30"/></g>
+    </svg>
     <h2>🧗 步步登峰</h2>
     <p>把每天爬的楼梯，变成登顶名山的旅程</p>
   </div>
@@ -1653,7 +1681,7 @@ function viewClimb() {
   })() : `
     <div class="card climb-card">
       <div class="empty" style="padding:30px 20px">
-        <div class="empty-icon">🧗</div>
+        ${inkMini('攀')}
         还没有进行中的挑战<br>选一座山，从今天的楼梯开始
       </div>
     </div>`}
@@ -2020,7 +2048,7 @@ document.addEventListener('input', (e) => {
       if (count) count.textContent = `共 ${list.length} 座山`;
       grid.outerHTML = list.length
         ? `<div class="m-grid">${list.map(mountainCard).join('')}</div>`
-        : `<div class="card empty"><div class="empty-icon">🔍</div>没有找到符合条件的山<br>换个关键词试试</div>`;
+        : `<div class="card empty">${inkMini('寻')}没有找到符合条件的山<br>换个关键词试试</div>`;
     }
   }
 });
