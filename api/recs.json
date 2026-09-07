@@ -1,13 +1,26 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-06T15:59:40+08:00",
-  "forDate": "2026-09-06",
-  "week": 36,
+  "generatedAt": "2026-09-07T16:28:22+08:00",
+  "forDate": "2026-09-07",
+  "week": 37,
   "weekendOf": "2026-09-12",
   "holiday": null,
   "weatherEnabled": true,
   "source": "github-actions",
   "seasonal": [
+    {
+      "id": "huangshan",
+      "name": "黄山",
+      "emoji": "🌊",
+      "province": "安徽 · 黄山市",
+      "elevation": 1864,
+      "difficulty": 4,
+      "difficultyLabel": "困难",
+      "scenery": 5.0,
+      "reason": "周末阴，日出正当时",
+      "score": 27.05,
+      "weather": "阴，降水概率 16%，山顶夜温约 -1°C"
+    },
     {
       "id": "maoershan",
       "name": "猫儿山",
@@ -18,8 +31,8 @@
       "difficultyLabel": "进阶",
       "scenery": 4.5,
       "reason": "周末晴，云海正当时",
-      "score": 26.27,
-      "weather": "晴，降水概率 2%，山顶夜温约 -5°C"
+      "score": 26.03,
+      "weather": "晴，降水概率 0%，山顶夜温约 -5°C"
     },
     {
       "id": "lingshan",
@@ -30,22 +43,9 @@
       "difficulty": 2,
       "difficultyLabel": "轻松",
       "scenery": 4.2,
-      "reason": "周末大致晴，露营正当时",
-      "score": 26.22,
-      "weather": "大致晴，降水概率 6%，山顶夜温约 -7°C"
-    },
-    {
-      "id": "laojunshan",
-      "name": "老君山",
-      "emoji": "⛩️",
-      "province": "河南 · 洛阳",
-      "elevation": 2217,
-      "difficulty": 2,
-      "difficultyLabel": "轻松",
-      "scenery": 4.7,
-      "reason": "周末毛毛雨，云海正当时",
-      "score": 24.38,
-      "weather": "毛毛雨，降水概率 15%，山顶夜温约 -2°C"
+      "reason": "周末多云，露营正当时",
+      "score": 25.98,
+      "weather": "多云，降水概率 4%，山顶夜温约 -7°C"
     },
     {
       "id": "taishan",
@@ -56,22 +56,22 @@
       "difficulty": 3,
       "difficultyLabel": "进阶",
       "scenery": 4.9,
-      "reason": "周末多云，夜爬正当时",
-      "score": 24.31,
-      "weather": "多云，降水概率 4%，山顶夜温约 -3°C"
+      "reason": "周末阴，夜爬正当时",
+      "score": 25.07,
+      "weather": "阴，降水概率 0%，山顶夜温约 -3°C"
     },
     {
-      "id": "wugongshan",
-      "name": "武功山",
-      "emoji": "⛺",
-      "province": "江西 · 萍乡",
-      "elevation": 1918,
-      "difficulty": 3,
-      "difficultyLabel": "进阶",
+      "id": "laojunshan",
+      "name": "老君山",
+      "emoji": "⛩️",
+      "province": "河南 · 洛阳",
+      "elevation": 2217,
+      "difficulty": 2,
+      "difficultyLabel": "轻松",
       "scenery": 4.7,
-      "reason": "9 月正当时：星空最佳观赏期，风景评分 4.7",
-      "score": 23.73,
-      "weather": "毛毛雨，降水概率 36%，山顶夜温约 0°C"
+      "reason": "周末阴，云海正当时",
+      "score": 24.62,
+      "weather": "阴，降水概率 12%，山顶夜温约 -4°C"
     }
   ],
   "trending": [
@@ -84,89 +84,22 @@
       "difficulty": 3,
       "difficultyLabel": "进阶",
       "scenery": 4.9,
-      "reason": "本周热度上升 52%，夜爬主题搜索量激增；周末多云，正适合出发",
-      "score": 18.77,
-      "weather": "多云，降水概率 4%，山顶夜温约 -3°C"
-    },
-    {
-      "id": "laojunshan",
-      "name": "老君山",
-      "emoji": "⛩️",
-      "province": "河南 · 洛阳",
-      "elevation": 2217,
-      "difficulty": 2,
-      "difficultyLabel": "轻松",
-      "scenery": 4.7,
-      "reason": "本周热度上升 52%，云海主题搜索量激增；周末毛毛雨，正适合出发",
-      "score": 18.44,
-      "weather": "毛毛雨，降水概率 15%，山顶夜温约 -2°C"
-    },
-    {
-      "id": "xiaowutaishan",
-      "name": "小五台山",
-      "emoji": "⛰️",
-      "province": "河北 · 张家口",
-      "elevation": 2882,
-      "difficulty": 5,
-      "difficultyLabel": "挑战",
-      "scenery": 4.5,
-      "reason": "本周热度上升 53%，重装主题搜索量激增；周末多云，正适合出发",
-      "score": 18.14,
-      "weather": "多云，降水概率 4%，山顶夜温约 -17°C"
-    },
-    {
-      "id": "tianmenshan",
-      "name": "天门山",
-      "emoji": "🚡",
-      "province": "湖南 · 张家界",
-      "elevation": 1518,
-      "difficulty": 2,
-      "difficultyLabel": "轻松",
-      "scenery": 4.8,
-      "reason": "本周热度上升 45%，天门洞主题搜索量激增；周末阴，正适合出发",
+      "reason": "本周热度上升 43%，夜爬主题搜索量激增；周末阴，正适合出发",
       "score": 18.06,
-      "weather": "阴，降水概率 0%，山顶夜温约 5°C"
+      "weather": "阴，降水概率 0%，山顶夜温约 -3°C"
     },
     {
-      "id": "songshan",
-      "name": "嵩山",
-      "emoji": "🥋",
-      "province": "河南 · 登封",
-      "elevation": 1491,
-      "difficulty": 3,
-      "difficultyLabel": "进阶",
-      "scenery": 4.5,
-      "reason": "本周热度上升 51%，五岳主题搜索量激增；周末阴，正适合出发",
-      "score": 17.86,
-      "weather": "阴，降水概率 5%，山顶夜温约 3°C"
-    }
-  ],
-  "weekend": [
-    {
-      "id": "lushan",
-      "name": "庐山",
-      "emoji": "💧",
-      "province": "江西 · 九江",
-      "elevation": 1474,
-      "difficulty": 3,
-      "difficultyLabel": "进阶",
-      "scenery": 4.7,
-      "reason": "周末两天刚好走完（建议 2 天行程）",
-      "score": 23.4,
-      "weather": "阴，降水概率 10%，山顶夜温约 5°C"
-    },
-    {
-      "id": "wudangshan",
-      "name": "武当山",
-      "emoji": "☯️",
-      "province": "湖北 · 十堰",
-      "elevation": 1612,
+      "id": "laoshan",
+      "name": "崂山",
+      "emoji": "🌊",
+      "province": "山东 · 青岛",
+      "elevation": 1132,
       "difficulty": 2,
       "difficultyLabel": "轻松",
-      "scenery": 4.7,
-      "reason": "周末两天刚好走完（建议 2 天行程）",
-      "score": 23.4,
-      "weather": "毛毛雨，降水概率 14%，山顶夜温约 -1°C"
+      "scenery": 4.6,
+      "reason": "本周热度上升 50%，道教名山主题搜索量激增；周末阴，正适合出发",
+      "score": 17.95,
+      "weather": "阴，降水概率 8%，山顶夜温约 5°C"
     },
     {
       "id": "wutaishan",
@@ -177,38 +110,92 @@
       "difficulty": 3,
       "difficultyLabel": "进阶",
       "scenery": 4.6,
-      "reason": "周末两天刚好走完（建议 3 天行程）",
-      "score": 23.2,
-      "weather": "多云，降水概率 14%，山顶夜温约 -17°C"
+      "reason": "本周热度上升 46%，佛教名山主题搜索量激增；周末毛毛雨，正适合出发",
+      "score": 17.85,
+      "weather": "毛毛雨，降水概率 18%，山顶夜温约 -17°C"
     },
     {
-      "id": "xiaowutaishan",
-      "name": "小五台山",
-      "emoji": "⛰️",
-      "province": "河北 · 张家口",
-      "elevation": 2882,
-      "difficulty": 5,
-      "difficultyLabel": "挑战",
-      "scenery": 4.5,
-      "reason": "周末两天刚好走完（建议 2 天行程）",
-      "score": 23.0,
-      "weather": "多云，降水概率 4%，山顶夜温约 -17°C"
+      "id": "yuntaishan",
+      "name": "云台山",
+      "emoji": "💦",
+      "province": "河南 · 焦作",
+      "elevation": 1308,
+      "difficulty": 1,
+      "difficultyLabel": "休闲",
+      "scenery": 4.6,
+      "reason": "本周热度上升 47%，峡谷主题搜索量激增；周末阴，正适合出发",
+      "score": 17.8,
+      "weather": "阴，降水概率 6%，山顶夜温约 5°C"
+    },
+    {
+      "id": "changbaishan",
+      "name": "长白山",
+      "emoji": "🌋",
+      "province": "吉林 · 延边",
+      "elevation": 2691,
+      "difficulty": 3,
+      "difficultyLabel": "进阶",
+      "scenery": 4.9,
+      "reason": "本周热度上升 37%，天池主题搜索量激增；周末阴，正适合出发",
+      "score": 17.79,
+      "weather": "阴，降水概率 12%，山顶夜温约 -14°C"
     }
   ],
-  "editors": [
+  "weekend": [
     {
-      "id": "siguniangshan",
-      "name": "四姑娘山大峰",
-      "emoji": "🏔️",
-      "province": "四川 · 阿坝",
-      "elevation": 5025,
+      "id": "huangshan",
+      "name": "黄山",
+      "emoji": "🌊",
+      "province": "安徽 · 黄山市",
+      "elevation": 1864,
+      "difficulty": 4,
+      "difficultyLabel": "困难",
+      "scenery": 5.0,
+      "reason": "周末阴，降水概率 16%，山顶夜温约 -1°C，说走就走",
+      "score": 19.0,
+      "weather": "阴，降水概率 16%，山顶夜温约 -1°C"
+    },
+    {
+      "id": "taishan",
+      "name": "泰山",
+      "emoji": "🌄",
+      "province": "山东 · 泰安",
+      "elevation": 1545,
+      "difficulty": 3,
+      "difficultyLabel": "进阶",
+      "scenery": 4.9,
+      "reason": "周末阴，降水概率 0%，山顶夜温约 -3°C，说走就走",
+      "score": 18.8,
+      "weather": "阴，降水概率 0%，山顶夜温约 -3°C"
+    },
+    {
+      "id": "huashan",
+      "name": "华山",
+      "emoji": "🧗",
+      "province": "陕西 · 渭南",
+      "elevation": 2154,
       "difficulty": 5,
       "difficultyLabel": "挑战",
       "scenery": 4.9,
-      "reason": "四姑娘山大峰是公认的 5000 米级入门雪山，技术要求低但海拔不低",
-      "score": 14.7,
-      "weather": null
+      "reason": "周末阴，降水概率 11%，山顶夜温约 -5°C，说走就走",
+      "score": 18.8,
+      "weather": "阴，降水概率 11%，山顶夜温约 -5°C"
     },
+    {
+      "id": "changbaishan",
+      "name": "长白山",
+      "emoji": "🌋",
+      "province": "吉林 · 延边",
+      "elevation": 2691,
+      "difficulty": 3,
+      "difficultyLabel": "进阶",
+      "scenery": 4.9,
+      "reason": "周末阴，降水概率 12%，山顶夜温约 -14°C，说走就走",
+      "score": 18.8,
+      "weather": "阴，降水概率 12%，山顶夜温约 -14°C"
+    }
+  ],
+  "editors": [
     {
       "id": "changbaishan",
       "name": "长白山",
@@ -232,6 +219,19 @@
       "difficultyLabel": "困难",
       "scenery": 4.8,
       "reason": "峨眉山是普贤菩萨道场，从报国寺徒步至金顶约需两日，沿途古寺林立、林深雾绕",
+      "score": 14.4,
+      "weather": null
+    },
+    {
+      "id": "tianmenshan",
+      "name": "天门山",
+      "emoji": "🚡",
+      "province": "湖南 · 张家界",
+      "elevation": 1518,
+      "difficulty": 2,
+      "difficultyLabel": "轻松",
+      "scenery": 4.8,
+      "reason": "天门山索道全长 7455 米，堪称世界最长高山客运索道之一",
       "score": 14.4,
       "weather": null
     }
