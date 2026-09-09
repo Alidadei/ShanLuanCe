@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-08T16:11:47+08:00",
-  "forDate": "2026-09-08",
+  "generatedAt": "2026-09-09T16:15:32+08:00",
+  "forDate": "2026-09-09",
   "week": 37,
   "weekendOf": "2026-09-12",
   "holiday": null,
@@ -17,9 +17,9 @@
       "difficulty": 4,
       "difficultyLabel": "困难",
       "scenery": 5.0,
-      "reason": "周末阴，日出正当时",
-      "score": 27.14,
-      "weather": "阴，降水概率 12%，山顶夜温约 -1°C"
+      "reason": "周末毛毛雨，日出正当时",
+      "score": 27.38,
+      "weather": "毛毛雨，降水概率 21%，山顶夜温约 -1°C"
     },
     {
       "id": "maoershan",
@@ -30,9 +30,9 @@
       "difficulty": 3,
       "difficultyLabel": "进阶",
       "scenery": 4.5,
-      "reason": "周末大致晴，云海正当时",
-      "score": 26.84,
-      "weather": "大致晴，降水概率 0%，山顶夜温约 -5°C"
+      "reason": "周末阴，云海正当时",
+      "score": 26.6,
+      "weather": "阴，降水概率 0%，山顶夜温约 -5°C"
     },
     {
       "id": "lingshan",
@@ -43,9 +43,22 @@
       "difficulty": 2,
       "difficultyLabel": "轻松",
       "scenery": 4.2,
-      "reason": "周末晴，露营正当时",
-      "score": 25.84,
-      "weather": "晴，降水概率 18%，山顶夜温约 -7°C"
+      "reason": "周末阴，露营正当时",
+      "score": 25.6,
+      "weather": "阴，降水概率 4%，山顶夜温约 -7°C"
+    },
+    {
+      "id": "sanqingshan",
+      "name": "三清山",
+      "emoji": "🗿",
+      "province": "江西 · 上饶",
+      "elevation": 1819,
+      "difficulty": 3,
+      "difficultyLabel": "进阶",
+      "scenery": 4.8,
+      "reason": "周末毛毛雨，云海正当时",
+      "score": 24.74,
+      "weather": "毛毛雨，降水概率 15%，山顶夜温约 1°C"
     },
     {
       "id": "taishan",
@@ -57,21 +70,8 @@
       "difficultyLabel": "进阶",
       "scenery": 4.9,
       "reason": "周末阴，夜爬正当时",
-      "score": 24.92,
-      "weather": "阴，降水概率 2%，山顶夜温约 -2°C"
-    },
-    {
-      "id": "laojunshan",
-      "name": "老君山",
-      "emoji": "⛩️",
-      "province": "河南 · 洛阳",
-      "elevation": 2217,
-      "difficulty": 2,
-      "difficultyLabel": "轻松",
-      "scenery": 4.7,
-      "reason": "周末毛毛雨，云海正当时",
-      "score": 24.76,
-      "weather": "毛毛雨，降水概率 20%，山顶夜温约 0°C"
+      "score": 24.69,
+      "weather": "阴，降水概率 2%，山顶夜温约 -1°C"
     }
   ],
   "trending": [
@@ -86,7 +86,7 @@
       "scenery": 4.9,
       "reason": "本周热度上升 43%，夜爬主题搜索量激增；周末阴，正适合出发",
       "score": 18.06,
-      "weather": "阴，降水概率 2%，山顶夜温约 -2°C"
+      "weather": "阴，降水概率 2%，山顶夜温约 -1°C"
     },
     {
       "id": "laoshan",
@@ -97,9 +97,9 @@
       "difficulty": 2,
       "difficultyLabel": "轻松",
       "scenery": 4.6,
-      "reason": "本周热度上升 50%，道教名山主题搜索量激增；周末阴，正适合出发",
+      "reason": "本周热度上升 50%，道教名山主题搜索量激增；周末毛毛雨，正适合出发",
       "score": 17.95,
-      "weather": "阴，降水概率 6%，山顶夜温约 7°C"
+      "weather": "毛毛雨，降水概率 25%，山顶夜温约 7°C"
     },
     {
       "id": "wutaishan",
@@ -110,9 +110,9 @@
       "difficulty": 3,
       "difficultyLabel": "进阶",
       "scenery": 4.6,
-      "reason": "本周热度上升 46%，佛教名山主题搜索量激增；周末大致晴，正适合出发",
+      "reason": "本周热度上升 46%，佛教名山主题搜索量激增；周末阴，正适合出发",
       "score": 17.85,
-      "weather": "大致晴，降水概率 9%，山顶夜温约 -17°C"
+      "weather": "阴，降水概率 4%，山顶夜温约 -16°C"
     },
     {
       "id": "yuntaishan",
@@ -125,7 +125,7 @@
       "scenery": 4.6,
       "reason": "本周热度上升 47%，峡谷主题搜索量激增；周末阴，正适合出发",
       "score": 17.8,
-      "weather": "阴，降水概率 12%，山顶夜温约 4°C"
+      "weather": "阴，降水概率 0%，山顶夜温约 6°C"
     },
     {
       "id": "changbaishan",
@@ -151,9 +151,9 @@
       "difficulty": 4,
       "difficultyLabel": "困难",
       "scenery": 5.0,
-      "reason": "周末阴，降水概率 12%，山顶夜温约 -1°C，说走就走",
+      "reason": "周末毛毛雨，降水概率 21%，山顶夜温约 -1°C，说走就走",
       "score": 19.0,
-      "weather": "阴，降水概率 12%，山顶夜温约 -1°C"
+      "weather": "毛毛雨，降水概率 21%，山顶夜温约 -1°C"
     },
     {
       "id": "taishan",
@@ -164,9 +164,9 @@
       "difficulty": 3,
       "difficultyLabel": "进阶",
       "scenery": 4.9,
-      "reason": "周末阴，降水概率 2%，山顶夜温约 -2°C，说走就走",
+      "reason": "周末阴，降水概率 2%，山顶夜温约 -1°C，说走就走",
       "score": 18.8,
-      "weather": "阴，降水概率 2%，山顶夜温约 -2°C"
+      "weather": "阴，降水概率 2%，山顶夜温约 -1°C"
     },
     {
       "id": "huashan",
@@ -177,9 +177,9 @@
       "difficulty": 5,
       "difficultyLabel": "挑战",
       "scenery": 4.9,
-      "reason": "周末阴，降水概率 10%，山顶夜温约 -5°C，说走就走",
+      "reason": "周末毛毛雨，降水概率 15%，山顶夜温约 -5°C，说走就走",
       "score": 18.8,
-      "weather": "阴，降水概率 10%，山顶夜温约 -5°C"
+      "weather": "毛毛雨，降水概率 15%，山顶夜温约 -5°C"
     },
     {
       "id": "changbaishan",
